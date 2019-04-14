@@ -15,6 +15,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use App\Entity\User;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\Validator\Validation;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -24,19 +25,25 @@ use Symfony\Component\Validator\Constraints as Assert;
 class ApiAuthController extends AbstractController
 {
     /**
+     * /**
      * @Route("/register", name="api_auth_register",  methods={"POST"})
      * @param Request $request
-     * @param UserManagerInterface $userManager
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     * @param UserPasswordEncoderInterface $encoder
+     * @return JsonResponse
      */
-    public function register(Request $request, UserManagerInterface $userManager)
+    public function register(Request $request, UserPasswordEncoderInterface $encoder)
     {
+        // Entity Manager
+        $em = $this->getDoctrine()->getManager();
+
         $data = json_decode(
             $request->getContent(),
             true
         );
 
-        $validator = Validation::createValidator();
+        // Ajouter validation des données ici
+
+        /*$validator = Validation::createValidator();
 
         $constraint = new Assert\Collection(array(
             // the keys correspond to the keys in the input array
@@ -45,34 +52,26 @@ class ApiAuthController extends AbstractController
             'email' => new Assert\Email(),
         ));
 
+        var_dump($data);
         $violations = $validator->validate($data, $constraint);
 
         if ($violations->count() > 0) {
             return new JsonResponse(["error" => (string)$violations], 500);
-        }
+        } */
 
         $username = $data['username'];
         $password = $data['password'];
         $email = $data['email'];
 
-        $user = new User();
-
-        $user
-            ->setUsername($username)
-            ->setPlainPassword($password)
-            ->setEmail($email)
-            ->setEnabled(true)
-            ->setRoles(['ROLE_USER'])
-            ->setSuperAdmin(false)
-        ;
-
-
+        $user = new User($username, $email);
+        $user->setPassword($encoder->encodePassword($user, $password));
 
         try {
-            $userManager->updateUser($user, true);
+            $em->persist($user);
         } catch (\Exception $e) {
             return new JsonResponse(["error" => "ERROR : ".$e->getMessage()], 500);
         }
+        $em->flush();
 
         return new JsonResponse(["success" => $user->getUsername(). " has been registered!"], 200);
     }
