@@ -66,8 +66,6 @@ class ApiAuthController extends AbstractController
             ->setSuperAdmin(false)
         ;
 
-
-
         try {
             $userManager->updateUser($user, true);
         } catch (\Exception $e) {
@@ -76,4 +74,35 @@ class ApiAuthController extends AbstractController
 
         return new JsonResponse(["success" => $user->getUsername(). " has been registered!"], 200);
     }
+
+    /**
+     * @Route("/users/{id}", name="user_show", methods={"GET"})
+     */
+    public function showUser(User $user)
+    {
+        $data =  $this->get('serializer')->serialize($user, 'json');
+
+        $response = new Response($data);
+        $response->headers->set('Content-Type', 'application/json');
+
+        return $response;
+    }
+
+    /**
+     * @Route("/users", name="users_list", methods={"GET"})
+     */
+    public function usersList()
+    {
+        $movies = $this->getDoctrine()
+            ->getRepository(User::class)
+            ->findAll();
+
+        $data =  $this->get('serializer')->serialize($movies, 'json');
+
+        $response = new Response($data);
+        $response->headers->set('Content-Type', 'application/json');
+
+        return $response;
+    }
+
 }
