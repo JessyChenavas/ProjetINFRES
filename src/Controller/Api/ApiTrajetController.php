@@ -10,6 +10,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
  * @Route("/covoit")
@@ -22,7 +23,7 @@ class ApiTrajetController extends AbstractController
      *
      *  @return JsonResponse
      */
-    public function creerTrajet(Request $request)
+    public function creerTrajet(Request $request, ValidatorInterface $validator)
     {
         $trajet = new Trajet();
 
@@ -39,7 +40,10 @@ class ApiTrajetController extends AbstractController
         $trajet->setTarif($data['tarif']);
         $trajet->setCreator($user);
 
-        # TODO: validators
+        $listErrors = $validator->validate($trajet);
+        if(count($listErrors) > 0) {
+            return new JsonResponse(["error" => (string)$listErrors], 500);
+        }
 
         $em = $this->getDoctrine()->getManager();
         $em->persist($trajet);
@@ -54,7 +58,7 @@ class ApiTrajetController extends AbstractController
      *
      *  @return JsonResponse
      */
-    public function modifierTrajet(Request $request, Trajet $trajet)
+    public function modifierTrajet(Request $request, Trajet $trajet, ValidatorInterface $validator)
     {
         $data = json_decode($request->getContent(), true);
 
@@ -64,7 +68,10 @@ class ApiTrajetController extends AbstractController
         $trajet->setPassagersMax($data['passagers_max']);
         $trajet->setTarif($data['tarif']);
 
-        # TODO: validators
+        $listErrors = $validator->validate($trajet);
+        if(count($listErrors) > 0) {
+            return new JsonResponse(["error" => (string)$listErrors], 500);
+        }
 
         $em = $this->getDoctrine()->getManager();
         $em->persist($trajet);

@@ -5,6 +5,7 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity
@@ -22,26 +23,38 @@ class Trajet
     /**
      * @ORM\ManyToOne(targetEntity="User", cascade={"persist"}, fetch="EAGER")
      * @ORM\JoinColumn(nullable=false)
+     * Assert\Valid()
      */
     private $creator;
 
     /**
      * @ORM\Column(type="text")
+     * Assert\Length(min=1)
      */
     private $lieuDepart;
 
     /**
      * @ORM\Column(type="text")
+     * Assert\Length(min=1)
      */
     private $lieuArrive;
 
     /**
      * @ORM\Column(type="datetime")
+     * @Assert\DateTime()
+     * @Assert\GreaterThan(
+     *     "+5 minutes",
+     *     message = "Merci de renseigner une date valable (au moins 5 minutes après la date actuelle)")
+
      */
     private $heureDepart;
 
     /**
      * @ORM\Column(type="integer")
+     * @Assert\Range(
+     *      min = 1,
+     *      minMessage = "Merci de renseigner un chiffre strictement supérieur à 0"
+     * )
      */
     private $passagersMax;
 
@@ -52,6 +65,10 @@ class Trajet
 
     /**
      * @ORM\Column(type="decimal", precision=7, scale=2)
+     * @Assert\Range(
+     *     max = 50,
+     *     maxMessage = "La somme doit être inférieure à 50€"
+     *  )
      */
     private $tarif;
 
