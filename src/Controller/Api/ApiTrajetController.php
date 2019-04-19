@@ -9,8 +9,6 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-
-use FOS\RestBundle\Controller\Annotations as Rest;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 
 /**
@@ -98,9 +96,13 @@ class ApiTrajetController extends AbstractController
      */
     public function ajouterPassager(Trajet $trajet, User $user) {
         if ($trajet->addPassager($user)) {
-            $json_response = new JsonResponse(["success" => sprintf("Le passager %s a été ajouté au trajet de %s ! ", $user->getUsername(), $trajet->getCreator()->getUsername())], 201);
+            $json_response = new JsonResponse(
+                ["success" => sprintf("Le passager %s a été ajouté au trajet de %s ! ", $user->getUsername(), $trajet->getCreator()->getUsername())],
+                201);
         } else {
-            $json_response = new JsonResponse(["error" => "L'ajout n'a pas été effectué : le trajet est complet ou le passager est déjà inscrit."], 409);
+            $json_response = new JsonResponse(
+                ["error" => "L'ajout n'a pas été effectué : le trajet est complet ou le passager est déjà inscrit."],
+                409);
         }
 
         $em = $this->getDoctrine()->getManager();
@@ -120,9 +122,13 @@ class ApiTrajetController extends AbstractController
      */
     public function supprimerPassager(Trajet $trajet, User $user) {
         if ($trajet->removePassager($user)) {
-            $json_response = new JsonResponse(["success" => sprintf("Le passager %s a été supprimé du trajet de %s ! ", $user->getUsername(), $trajet->getCreator()->getUsername())], 200);
+            $json_response = new JsonResponse(
+                ["success" => sprintf("Le passager %s a été supprimé du trajet de %s ! ", $user->getUsername(), $trajet->getCreator()->getUsername())],
+                200);
         } else {
-            $json_response = new JsonResponse(["error" => "Pas de suppression possible : l'utilisateur n'est pas inscrit"], 409);
+            $json_response = new JsonResponse(
+                ["error" => "Pas de suppression possible : l'utilisateur n'est pas inscrit"],
+                409);
         }
 
         $em = $this->getDoctrine()->getManager();
@@ -137,7 +143,8 @@ class ApiTrajetController extends AbstractController
      */
     public function afficherTrajet(Trajet $trajet)
     {
-        $data =  $this->get('serializer')->serialize($trajet, 'json');
+        $data =  $this->get('serializer')->serialize($trajet, 'json', ['attributes' =>
+            [ 'lieuDepart', 'lieuArrive', 'heureDepart', 'passagersMax', 'tarif', 'creator' => ['username'],  'passagers' => ['username']]]);
 
         $response = new Response($data);
         $response->headers->set('Content-Type', 'application/json');
@@ -154,7 +161,8 @@ class ApiTrajetController extends AbstractController
             ->getRepository(Trajet::class)
             ->findAll();
 
-        $data =  $this->get('serializer')->serialize($trajets, 'json');
+        $data =  $this->get('serializer')->serialize($trajets, 'json', ['attributes' =>
+            [ 'lieuDepart', 'lieuArrive', 'heureDepart', 'passagersMax', 'tarif', 'creator' => ['username'],  'passagers' => ['username']]]);
 
         $response = new Response($data);
         $response->headers->set('Content-Type', 'application/json');

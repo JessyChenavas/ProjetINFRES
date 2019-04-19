@@ -76,11 +76,11 @@ class ApiAuthController extends AbstractController
     }
 
     /**
-     * @Route("/users/{id}", name="user_show", methods={"GET"})
+     * @Route("/user/{id}", name="user_show", methods={"GET"})
      */
-    public function showUser(User $user)
+    public function afficherUtilisateur(User $user)
     {
-        $data =  $this->get('serializer')->serialize($user, 'json');
+        $data =  $this->get('serializer')->serialize($user, 'json', ['attributes' => ['id', 'username', 'email']]);
 
         $response = new Response($data);
         $response->headers->set('Content-Type', 'application/json');
@@ -91,18 +91,17 @@ class ApiAuthController extends AbstractController
     /**
      * @Route("/users", name="users_list", methods={"GET"})
      */
-    public function usersList()
+    public function listeUtilisateurs()
     {
-        $movies = $this->getDoctrine()
+        $users = $this->getDoctrine()
             ->getRepository(User::class)
             ->findAll();
 
-        $data =  $this->get('serializer')->serialize($movies, 'json');
+        $data =  $this->get('serializer')->serialize($users, 'json', ['attributes' => ['id', 'username', 'email']]);
 
         $response = new Response($data);
         $response->headers->set('Content-Type', 'application/json');
 
         return $response;
     }
-
 }
