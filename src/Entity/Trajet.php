@@ -20,7 +20,7 @@ class Trajet
     private $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity="User", cascade={"all"}, fetch="EAGER")
+     * @ORM\ManyToOne(targetEntity="User", cascade={"persist"}, fetch="EAGER")
      * @ORM\JoinColumn(nullable=false)
      */
     private $creator;
@@ -51,7 +51,7 @@ class Trajet
     private $passagers;
 
     /**
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="decimal", precision=7, scale=2)
      */
     private $tarif;
 
@@ -148,15 +148,21 @@ class Trajet
         return $this->passagers;
     }
 
-    // Notez le singulier, on ajoute une seule catégorie à la fois
     public function addPassager(User $passager)
     {
-        $this->passagers[] = $passager;
+        $newPassagerAvailable = ($this->passagers->count() < $this->passagersMax);
+        if ($newPassagerAvailable) {
+            if ($this->passagers->contains($passager)) { return 0; }
+
+            $this->passagers[] = $passager;
+        }
+
+        return $newPassagerAvailable;
     }
 
     public function removePassager(User $passager)
     {
-        $this->passagers->removeElement($passager);
+        return $this->passagers->removeElement($passager);
     }
 
     /**

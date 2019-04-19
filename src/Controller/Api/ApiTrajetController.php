@@ -19,7 +19,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 class ApiTrajetController extends AbstractController
 {
     /**
-     *  @Route("/trajets", name="api_auth_register",  methods={"POST"})
+     *  @Route("/trajets", name="api_trajet_create",  methods={"POST"})
      *  @param Request $request
      *
      *  @return JsonResponse
@@ -41,6 +41,8 @@ class ApiTrajetController extends AbstractController
         $trajet->setTarif($data['tarif']);
         $trajet->setCreator($user);
 
+        # TODO: validators
+
         $em = $this->getDoctrine()->getManager();
         $em->persist($trajet);
         $em->flush();
@@ -49,7 +51,45 @@ class ApiTrajetController extends AbstractController
     }
 
     /**
-     *  @Route("/trajet/{trajet_id}/passager/add/{passager_id}", name="add_passager")
+     *  @Route("/trajet/{id}", name="api_trajet_update",  methods={"PUT"})
+     *  @param Request $request
+     *
+     *  @return JsonResponse
+     */
+    public function modifierTrajet(Request $request, Trajet $trajet)
+    {
+        $data = json_decode($request->getContent(), true);
+
+        $trajet->setLieuDepart($data['lieu_depart']);
+        $trajet->setLieuArrive($data['lieu_arrive']);
+        $trajet->setHeureDepart(new \DateTime($data["heure_depart"]));
+        $trajet->setPassagersMax($data['passagers_max']);
+        $trajet->setTarif($data['tarif']);
+
+        # TODO: validators
+
+        $em = $this->getDoctrine()->getManager();
+        $em->persist($trajet);
+        $em->flush();
+
+        return new JsonResponse(["success" => "Le trajet a été modifié !"], 200);
+    }
+
+    /**
+     *  @Route("/trajet/{id}", name="api_trajet_delete", methods={"DELETE"})
+     *
+     *  @return JsonResponse
+     */
+    public function supprimerTrajet(Trajet $trajet) {
+        $em = $this->getDoctrine()->getManager();
+        $em->remove($trajet);
+        $em->flush();
+
+        return new JsonResponse(["success" => "Le trajet a été supprimé !"], 200);
+    }
+
+    /**
+     *  @Route("/trajet/{trajet_id}/passager/{passager_id}", name="add_passager", methods={"POST"})
      *
      *  @ParamConverter("trajet", options={"mapping": {"trajet_id": "id"}})
      *  @ParamConverter("user", options={"mapping": {"passager_id": "id"}})
@@ -57,19 +97,21 @@ class ApiTrajetController extends AbstractController
      *  @return JsonResponse
      */
     public function ajouterPassager(Trajet $trajet, User $user) {
-        $trajet->addPassager($user);
+        if ($trajet->addPassager($user)) {
+            $json_response = new JsonResponse(["success" => sprintf("Le passager %s a été ajouté au trajet de %s ! ", $user->getUsername(), $trajet->getCreator()->getUsername())], 201);
+        } else {
+            $json_response = new JsonResponse(["error" => "L'ajout n'a pas été effectué : le trajet est complet ou le passager est déjà inscrit."], 409);
+        }
 
         $em = $this->getDoctrine()->getManager();
         $em->persist($trajet);
         $em->flush();
 
-       # gérer passagers max
-
-        return new JsonResponse(["success" => "Le passager " . $user->getUsername() . " est ajouté au trajet de " . $trajet->getCreator()->getUsername() . "!"], 201);
+        return $json_response;
     }
 
     /**
-     *  @Route("/trajet/{trajet_id}/passager/remove/{passager_id}", name="remove_passager")
+     *  @Route("/trajet/{trajet_id}/passager/{passager_id}", name="remove_passager", methods={"DELETE"})
      *
      *  @ParamConverter("trajet", options={"mapping": {"trajet_id": "id"}})
      *  @ParamConverter("user", options={"mapping": {"passager_id": "id"}})
@@ -77,15 +119,17 @@ class ApiTrajetController extends AbstractController
      *  @return JsonResponse
      */
     public function supprimerPassager(Trajet $trajet, User $user) {
-        $trajet->removePassager($user);
+        if ($trajet->removePassager($user)) {
+            $json_response = new JsonResponse(["success" => sprintf("Le passager %s a été supprimé du trajet de %s ! ", $user->getUsername(), $trajet->getCreator()->getUsername())], 200);
+        } else {
+            $json_response = new JsonResponse(["error" => "Pas de suppression possible : l'utilisateur n'est pas inscrit"], 409);
+        }
 
         $em = $this->getDoctrine()->getManager();
         $em->persist($trajet);
         $em->flush();
 
-        # gérer passagers max
-
-        return new JsonResponse(["success" => "Le passager " . $user->getUsername() . " est supprimé du trajet de " . $trajet->getCreator()->getUsername() . "!"], 201);
+        return $json_response;
     }
 
     /**
@@ -101,4 +145,20 @@ class ApiTrajetController extends AbstractController
         return $response;
     }
 
+    /**
+     * @Route("/trajets", name="trajets_list", methods={"GET"})
+     */
+    public function listeTrajets()
+    {
+        $trajets = $this->getDoctrine()
+            ->getRepository(Trajet::class)
+            ->findAll();
+
+        $data =  $this->get('serializer')->serialize($trajets, 'json');
+
+        $response = new Response($data);
+        $response->headers->set('Content-Type', 'application/json');
+
+        return $response;
+    }
 }
