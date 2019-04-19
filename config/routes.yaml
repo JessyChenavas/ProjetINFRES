@@ -1,9 +1,12 @@
+# This file is the entry point to configure your own HTTP routes.
+# Files in the routes/ subdirectory configure the routes for your dependencies.
+
 #index:
 #    path: /
-#    controller: App\Controller\DefaultController::index
-fos_user:
-  resource: "@FOSUserBundle/Resources/config/routing/all.xml"
+#    defaults: { _controller: 'App\Controller\DefaultController::index' }
 
-api:
-  prefix: /api
-  resource: '../src/Controller/Api'
+fos_oauth_server_token:
+    resource: "@FOSOAuthServerBundle/Resources/config/routing/token.xml"
+
+fos_oauth_server_authorize:
+    resource: "@FOSOAuthServerBundle/Resources/config/routing/authorize.xml"

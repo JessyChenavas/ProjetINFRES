@@ -74,34 +74,4 @@ class ApiAuthController extends AbstractController
 
         return new JsonResponse(["success" => $user->getUsername(). " has been registered!"], 200);
     }
-
-    /**
-     * @Route("/user/{id}", name="user_show", methods={"GET"})
-     */
-    public function afficherUtilisateur(User $user)
-    {
-        $data =  $this->get('serializer')->serialize($user, 'json', ['attributes' => ['id', 'username', 'email']]);
-
-        $response = new Response($data);
-        $response->headers->set('Content-Type', 'application/json');
-
-        return $response;
-    }
-
-    /**
-     * @Route("/users", name="users_list", methods={"GET"})
-     */
-    public function listeUtilisateurs()
-    {
-        $users = $this->getDoctrine()
-            ->getRepository(User::class)
-            ->findAll();
-
-        $data =  $this->get('serializer')->serialize($users, 'json', ['attributes' => ['id', 'username', 'email']]);
-
-        $response = new Response($data);
-        $response->headers->set('Content-Type', 'application/json');
-
-        return $response;
-    }
 }

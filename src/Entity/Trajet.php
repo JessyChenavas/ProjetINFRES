@@ -45,7 +45,6 @@ class Trajet
      * @Assert\GreaterThan(
      *     "+5 minutes",
      *     message = "Merci de renseigner une date valable (au moins 5 minutes après la date actuelle)")
-
      */
     private $heureDepart;
 

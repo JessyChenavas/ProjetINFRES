@@ -13,7 +13,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
- * @Route("/covoit")
+ * @Route("/api")
  */
 class ApiTrajetController extends AbstractController
 {
