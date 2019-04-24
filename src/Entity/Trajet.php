@@ -164,9 +164,12 @@ class Trajet
         return $this->passagers;
     }
 
+    /**
+     * @return mixed
+     */
     public function addPassager(User $passager)
     {
-        $newPassagerAvailable = ($this->passagers->count() < $this->passagersMax);
+        $newPassagerAvailable = !$this->estPlein();
         if ($newPassagerAvailable) {
             if ($this->passagers->contains($passager)) { return 0; }
 
@@ -176,6 +179,9 @@ class Trajet
         return $newPassagerAvailable;
     }
 
+    /**
+     * @return mixed
+     */
     public function removePassager(User $passager)
     {
         return $this->passagers->removeElement($passager);
@@ -195,5 +201,12 @@ class Trajet
     public function setTarif($tarif)
     {
         $this->tarif = $tarif;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function estPlein() {
+        return $this->passagers->count() >= $this->passagersMax;
     }
 }
