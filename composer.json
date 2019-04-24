@@ -30,8 +30,7 @@
         "symfony/twig-bundle": "3.4.*",
         "symfony/validator": "3.4.*",
         "symfony/web-link": "3.4.*",
-        "symfony/yaml": "3.4.*",
-        "white-october/pagerfanta-bundle": "^1.2"
+        "symfony/yaml": "3.4.*"
     },
     "require-dev": {
         "symfony/debug-pack": "*",
