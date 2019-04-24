@@ -8,18 +8,18 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use FOS\RestBundle\Controller\Annotations as Rest;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
- * @Route("/api")
+ * @Route("/api", name="api_")
  */
 class ApiTrajetController extends AbstractController
 {
     /**
-     *  @Route("/trajets", name="api_trajet_create",  methods={"POST"})
-     *  @param Request $request
+     *  @Rest\Post("/trajets")
      *
      *  @return JsonResponse
      */
@@ -53,8 +53,7 @@ class ApiTrajetController extends AbstractController
     }
 
     /**
-     *  @Route("/trajet/{id}", name="api_trajet_update",  methods={"PUT"})
-     *  @param Request $request
+     *  @Rest\Put("/trajet/{id}")
      *
      *  @return JsonResponse
      */
@@ -81,7 +80,7 @@ class ApiTrajetController extends AbstractController
     }
 
     /**
-     *  @Route("/trajet/{id}", name="api_trajet_delete", methods={"DELETE"})
+     *  @Rest\Delete("/trajet/{id}")
      *
      *  @return JsonResponse
      */
@@ -94,7 +93,7 @@ class ApiTrajetController extends AbstractController
     }
 
     /**
-     *  @Route("/trajet/{trajet_id}/passager/{passager_id}", name="add_passager", methods={"POST"})
+     *  @Rest\Post("/trajet/{trajet_id}/passager/{passager_id}")
      *
      *  @ParamConverter("trajet", options={"mapping": {"trajet_id": "id"}})
      *  @ParamConverter("user", options={"mapping": {"passager_id": "id"}})
@@ -120,7 +119,7 @@ class ApiTrajetController extends AbstractController
     }
 
     /**
-     *  @Route("/trajet/{trajet_id}/passager/{passager_id}", name="remove_passager", methods={"DELETE"})
+     *  @Rest\Delete("/trajet/{trajet_id}/passager/{passager_id}")
      *
      *  @ParamConverter("trajet", options={"mapping": {"trajet_id": "id"}})
      *  @ParamConverter("user", options={"mapping": {"passager_id": "id"}})
@@ -146,7 +145,9 @@ class ApiTrajetController extends AbstractController
     }
 
     /**
-     * @Route("/trajet/{id}", name="trajet_show", methods={"GET"})
+     * @Rest\Get("/trajet/{id}")
+     *
+     * @return Response
      */
     public function afficherTrajet(Trajet $trajet)
     {
@@ -154,13 +155,14 @@ class ApiTrajetController extends AbstractController
             [ 'lieuDepart', 'lieuArrive', 'heureDepart', 'passagersMax', 'tarif', 'creator' => ['username'],  'passagers' => ['username']]]);
 
         $response = new Response($data);
-        $response->headers->set('Content-Type', 'application/json');
 
         return $response;
     }
 
     /**
-     * @Route("/trajets", name="trajets_list", methods={"GET"})
+     * @Rest\Get("/trajets")
+     *
+     * @return Response
      */
     public function listeTrajets()
     {
@@ -172,7 +174,6 @@ class ApiTrajetController extends AbstractController
             [ 'lieuDepart', 'lieuArrive', 'heureDepart', 'passagersMax', 'tarif', 'creator' => ['username'],  'passagers' => ['username']]]);
 
         $response = new Response($data);
-        $response->headers->set('Content-Type', 'application/json');
 
         return $response;
     }

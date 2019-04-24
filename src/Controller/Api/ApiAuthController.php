@@ -12,22 +12,21 @@ use FOS\UserBundle\Model\UserManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use App\Entity\User;
-use Symfony\Component\Routing\Annotation\Route;
+use FOS\RestBundle\Controller\Annotations as Rest;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\Validator\Validation;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * @Route("/auth")
+ * @Route("/auth", name="auth_")
  */
 class ApiAuthController extends AbstractController
 {
     /**
-     * @Route("/register", name="api_auth_register",  methods={"POST"})
-     * @param Request $request
-     * @param UserManagerInterface $userManager
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     * @Rest\Post("/register")
+
+     * @return JsonResponse
      */
     public function register(Request $request, UserManagerInterface $userManager)
     {

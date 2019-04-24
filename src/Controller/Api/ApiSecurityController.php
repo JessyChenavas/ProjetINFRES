@@ -6,7 +6,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use FOS\RestBundle\Controller\Annotations as Rest;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use FOS\OAuthServerBundle\Model\ClientManagerInterface;
 
@@ -19,7 +19,7 @@ class ApiSecurityController extends AbstractController
     }
 
     /**
-     * @Route("/createClient", name="api_create_client",  methods={"POST"})
+     * @Rest\Post("/createClient")
      *
      * @return Response
      */
