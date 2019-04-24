@@ -15,3 +15,9 @@ Il faudra que je fasse le fichier de specifications API
 - Name : sf4
 - User : sf4
 - Pass : sf4
+
+
+
+Useful docs : 
+
+https://www.adcisolutions.com/knowledge/getting-started-rest-api-symfony-4
