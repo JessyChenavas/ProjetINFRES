@@ -19,7 +19,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 class ApiTrajetController extends AbstractController
 {
     /**
-     *  @Rest\Post("/trajets")
+     *  @Rest\Post("/trajets", name="creer_trajet")
      *
      *  @return JsonResponse
      */
@@ -53,7 +53,7 @@ class ApiTrajetController extends AbstractController
     }
 
     /**
-     *  @Rest\Put("/trajet/{id}")
+     *  @Rest\Put("/trajet/{id}", name="modifier_trajet")
      *
      *  @return JsonResponse
      */
@@ -80,7 +80,7 @@ class ApiTrajetController extends AbstractController
     }
 
     /**
-     *  @Rest\Delete("/trajet/{id}")
+     *  @Rest\Delete("/trajet/{id}", name="supprimer_trajet")
      *
      *  @return JsonResponse
      */
@@ -93,7 +93,7 @@ class ApiTrajetController extends AbstractController
     }
 
     /**
-     *  @Rest\Post("/trajet/{trajet_id}/passager/{passager_id}")
+     *  @Rest\Post("/trajet/{trajet_id}/passager/{passager_id}", name="ajouter_passager")
      *
      *  @ParamConverter("trajet", options={"mapping": {"trajet_id": "id"}})
      *  @ParamConverter("user", options={"mapping": {"passager_id": "id"}})
@@ -119,7 +119,7 @@ class ApiTrajetController extends AbstractController
     }
 
     /**
-     *  @Rest\Delete("/trajet/{trajet_id}/passager/{passager_id}")
+     *  @Rest\Delete("/trajet/{trajet_id}/passager/{passager_id}", name="supprimer_trajet")
      *
      *  @ParamConverter("trajet", options={"mapping": {"trajet_id": "id"}})
      *  @ParamConverter("user", options={"mapping": {"passager_id": "id"}})
@@ -145,7 +145,7 @@ class ApiTrajetController extends AbstractController
     }
 
     /**
-     * @Rest\Get("/trajet/{id}")
+     * @Rest\Get("/trajet/{id}", name="afficher_trajet")
      *
      * @return Response
      */
@@ -160,7 +160,7 @@ class ApiTrajetController extends AbstractController
     }
 
     /**
-     * @Rest\Get("/trajets")
+     * @Rest\Get("/trajets", name="liste_trajets")
      *
      * @return Response
      */

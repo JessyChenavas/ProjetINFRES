@@ -18,7 +18,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 class ApiEvenementController extends AbstractController
 {
     /**
-     * @Rest\Get("/events")
+     * @Rest\Get("/events", name="liste_evenements")
      *
      * @return Response
      */
@@ -35,7 +35,7 @@ class ApiEvenementController extends AbstractController
     }
 
     /**
-     * @Rest\Get("/event/{id}")
+     * @Rest\Get("/event/{id}", name="afficher_evenement")
      *
      * @return Response
      */
@@ -50,7 +50,7 @@ class ApiEvenementController extends AbstractController
 
 
     /**
-     * @Rest\Post("/event")
+     * @Rest\Post("/event", name="creer_evenement")
      *
      * @return JsonResponse
      */
@@ -68,11 +68,11 @@ class ApiEvenementController extends AbstractController
             return new JsonResponse(['success' => sprintf('L\'évènement %s a bien été ajouté !', $data['titre'])], 201);
         }
 
-        return new JsonResponse(['error' => $form->getErrors()], 500);
+        return new JsonResponse(['error' => $form->getErrors(true, false)->__toString()], 500);
     }
 
     /**
-     * @Rest\Put("/event/{id}")
+     * @Rest\Put("/event/{id}", name="modifier_evenement")
      *
      * @return JsonResponse
      */
@@ -89,11 +89,11 @@ class ApiEvenementController extends AbstractController
             return new JsonResponse(['success' => sprintf('L\'évènement %s a bien été modifié !', $data['titre'])], 200);
         }
 
-        return new JsonResponse(['error' => $form->getErrors()], 500);
+        return new JsonResponse(['error' => $form->getErrors(true, false)->__toString()], 500);
     }
 
     /**
-     *  @Rest\Delete("/event/{id}")
+     *  @Rest\Delete("/event/{id}", name="supprimer_evenement")
      *
      *  @return JsonResponse
      */

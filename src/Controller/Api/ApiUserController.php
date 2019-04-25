@@ -15,7 +15,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 class ApiUserController extends AbstractController
 {
     /**
-     * @Rest\Get("/user/{id}")
+     * @Rest\Get("/user/{id}", name="afficher_utlisateur")
      *
      * @return Response
      */
@@ -29,7 +29,7 @@ class ApiUserController extends AbstractController
     }
 
     /**
-     * @Rest\Get("/users")
+     * @Rest\Get("/users", name="liste_utlisateurs")
      *
      * @return Response
      */
