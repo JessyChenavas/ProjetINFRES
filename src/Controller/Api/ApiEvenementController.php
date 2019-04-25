@@ -33,6 +33,22 @@ class ApiEvenementController extends AbstractController
         $response = new Response($data);
         return $response;
     }
+
+    /**
+     * @Rest\Get("/event/{id}")
+     *
+     * @return Response
+     */
+    public function afficherTrajet(Evenement $event)
+    {
+        $data =  $this->get('serializer')->serialize($event, 'json', ['attributes' =>
+            [ 'titre', 'description', 'lieu', 'date']]);
+
+        $response = new Response($data);
+        return $response;
+    }
+
+
     /**
      * @Rest\Post("/event")
      *
@@ -53,5 +69,39 @@ class ApiEvenementController extends AbstractController
         }
 
         return new JsonResponse(['error' => $form->getErrors()], 500);
+    }
+
+    /**
+     * @Rest\Put("/event/{id}")
+     *
+     * @return JsonResponse
+     */
+    public function modifierEvenement(Request $request, Evenement $event)
+    {
+        $form = $this->createForm(EvenementType::class, $event);
+        $data = json_decode($request->getContent(), true);
+        $form->submit($data);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $em = $this->getDoctrine()->getManager();
+            $em->persist($event);
+            $em->flush();
+            return new JsonResponse(['success' => sprintf('L\'évènement %s a bien été modifié !', $data['titre'])], 200);
+        }
+
+        return new JsonResponse(['error' => $form->getErrors()], 500);
+    }
+
+    /**
+     *  @Rest\Delete("/event/{id}")
+     *
+     *  @return JsonResponse
+     */
+    public function supprimerEvenement(Evenement $event) {
+        $em = $this->getDoctrine()->getManager();
+        $em->remove($event);
+        $em->flush();
+
+        return new JsonResponse(["success" => "L'évènement a été supprimé !"], 200);
     }
 }
