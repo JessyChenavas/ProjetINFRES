@@ -22,7 +22,7 @@ class ApiEvenementController extends AbstractController
      *
      * @return Response
      */
-    public function afficherEvenements()
+    public function listeEvenements()
     {
         $repository = $this->getDoctrine()->getRepository(Evenement::class);
         $events = $repository->findall();
@@ -39,7 +39,7 @@ class ApiEvenementController extends AbstractController
      *
      * @return Response
      */
-    public function afficherTrajet(Evenement $event)
+    public function afficherEvenement(Evenement $event)
     {
         $data =  $this->get('serializer')->serialize($event, 'json', ['attributes' =>
             [ 'titre', 'description', 'lieu', 'date']]);
