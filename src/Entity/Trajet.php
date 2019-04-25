@@ -23,19 +23,19 @@ class Trajet
     /**
      * @ORM\ManyToOne(targetEntity="User", cascade={"persist"}, fetch="EAGER")
      * @ORM\JoinColumn(nullable=false)
-     * Assert\Valid()
+     * @Assert\Valid()
      */
     private $creator;
 
     /**
-     * @ORM\Column(type="text")
-     * Assert\Length(min=1)
+     * @ORM\Column(type="string", length=100)
+     * @Assert\NotBlank()
      */
     private $lieuDepart;
 
     /**
-     * @ORM\Column(type="text")
-     * Assert\Length(min=1)
+     * @ORM\Column(type="string", length=100)
+     * @Assert\NotBlank()
      */
     private $lieuArrive;
 
@@ -74,6 +74,7 @@ class Trajet
     public function __construct()
     {
         $this->passagers = new ArrayCollection();
+        $this->heureDepart = new \DateTime();
     }
 
     /**
