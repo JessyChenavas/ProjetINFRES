@@ -27,13 +27,15 @@ class ApiSecurityController extends AbstractController
     {
         $data = json_decode($request->getContent(), true);
         if (empty($data['redirect-uri']) || empty($data['grant-type'])) {
-            return new JsonResponse($data);
+            return new JsonResponse(['error' => 'Field(s) empty']);
         }
+
         $clientManager = $this->client_manager;
         $client = $clientManager->createClient();
         $client->setRedirectUris([$data['redirect-uri']]);
         $client->setAllowedGrantTypes([$data['grant-type']]);
         $clientManager->updateClient($client);
+
         $rows = [
             'client_id' => $client->getPublicId(), 'client_secret' => $client->getSecret()
         ];
