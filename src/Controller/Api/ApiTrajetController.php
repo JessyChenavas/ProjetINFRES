@@ -119,7 +119,7 @@ class ApiTrajetController extends AbstractController
     }
 
     /**
-     *  @Rest\Delete("/trajet/{trajet_id}/passager/{passager_id}", name="supprimer_trajet")
+     *  @Rest\Delete("/trajet/{trajet_id}/passager/{passager_id}", name="supprimer_passager")
      *
      *  @ParamConverter("trajet", options={"mapping": {"trajet_id": "id"}})
      *  @ParamConverter("user", options={"mapping": {"passager_id": "id"}})
