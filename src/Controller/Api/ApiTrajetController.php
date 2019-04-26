@@ -101,12 +101,18 @@ class ApiTrajetController extends AbstractController
      *  @return JsonResponse
      */
     public function ajouterPassager(Trajet $trajet, User $user) {
+        if($trajet->getCreator()->getId() == $user->getId()) {
+            return new JsonResponse(
+                ["error" => "L'ajout n'a pas été effectué : le créateur ne peut pas être passagé."],
+                409);
+        }
+
         if ($trajet->addPassager($user)) {
             $json_response = new JsonResponse(
                 ["success" => sprintf("Le passager %s a été ajouté au trajet de %s ! ", $user->getUsername(), $trajet->getCreator()->getUsername())],
                 201);
         } else {
-            $json_response = new JsonResponse(
+            return new JsonResponse(
                 ["error" => "L'ajout n'a pas été effectué : le trajet est complet ou le passager est déjà inscrit."],
                 409);
         }
