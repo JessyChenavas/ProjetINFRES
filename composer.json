@@ -13,7 +13,7 @@
         "sensio/generator-bundle": "^3.1",
         "symfony/asset": "3.4.*",
         "symfony/console": "3.4.*",
-        "symfony/dotenv": "3.4.*",
+        "symfony/dotenv": "4.2.*",
         "symfony/expression-language": "3.4.*",
         "symfony/flex": "^1.1",
         "symfony/form": "3.4.*",
@@ -81,7 +81,7 @@
     "extra": {
         "symfony": {
             "allow-contrib": false,
-            "require": "3.4.*"
+            "require": "4.2.*"
         }
     }
 }
