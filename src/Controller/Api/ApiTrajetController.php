@@ -158,7 +158,7 @@ class ApiTrajetController extends AbstractController
     public function afficherTrajet(Trajet $trajet)
     {
         $data =  $this->get('serializer')->serialize($trajet, 'json', ['attributes' =>
-            [ 'lieuDepart', 'lieuArrive', 'heureDepart', 'passagersMax', 'tarif', 'creator' => ['username'],  'passagers' => ['username']]]);
+            [ 'lieuDepart', 'lieuArrive', 'heureDepart', 'passagersMax', 'tarif', 'creator' => ['id','username','email'],  'passagers' => ['id','username','email']]]);
 
         $response = new Response($data);
 
@@ -177,7 +177,7 @@ class ApiTrajetController extends AbstractController
             ->findAll();
 
         $data =  $this->get('serializer')->serialize($trajets, 'json', ['attributes' =>
-            [ 'lieuDepart', 'lieuArrive', 'heureDepart', 'passagersMax', 'tarif', 'creator' => ['username'],  'passagers' => ['username']]]);
+            [ 'lieuDepart', 'lieuArrive', 'heureDepart', 'passagersMax', 'tarif', 'creator' => ['id','username','email'],  'passagers' => ['id','username','email']]]);
 
         $response = new Response($data);
 
