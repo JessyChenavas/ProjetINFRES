@@ -20,6 +20,31 @@ class User extends BaseUser
     protected $id;
 
     /**
+     * @ORM\Column(type="string", length=40)
+     * @Assert\NotBlank()
+     */
+    private $nom;
+
+    /**
+     * @ORM\Column(type="string", length=40)
+     * @Assert\NotBlank()
+     */
+    private $prenom;
+
+    /**
+     * @ORM\Column(type="string", length=20)
+     * @Assert\NotBlank()
+     */
+    private $genre;
+
+    /**
+     * @ORM\Column(type="date")
+     * @Assert\Date()
+     * @Assert\GreaterThanOrEqual("1900-01-01")
+     */
+    private $dateNaissance;
+
+    /**
      * @ORM\Column(type="string", length=10)
      * @Assert\NotBlank()
      */
@@ -75,5 +100,69 @@ class User extends BaseUser
     public function setVoiture(Voiture $voiture)
     {
         $this->voiture = $voiture;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getDateNaissance()
+    {
+        return $this->dateNaissance;
+    }
+
+    /**
+     * @param mixed $dateNaissance
+     */
+    public function setDateNaissance($dateNaissance)
+    {
+        $this->dateNaissance = $dateNaissance;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getGenre()
+    {
+        return $this->genre;
+    }
+
+    /**
+     * @param mixed $genre
+     */
+    public function setGenre($genre)
+    {
+        $this->genre = $genre;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getNom()
+    {
+        return $this->nom;
+    }
+
+    /**
+     * @param mixed $nom
+     */
+    public function setNom($nom)
+    {
+        $this->nom = $nom;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getPrenom()
+    {
+        return $this->prenom;
+    }
+
+    /**
+     * @param mixed $prenom
+     */
+    public function setPrenom($prenom)
+    {
+        $this->prenom = $prenom;
     }
 }

@@ -31,10 +31,6 @@ class ApiAuthController extends AbstractController
             true
         );
 
-        $username = $data['username'];
-        $password = $data['password'];
-        $email = $data['email'];
-
         $user = new User();
 
         if (preg_match("/(CMC|MKX|FI|INFRES)/", $data['promotion'])) {
@@ -48,13 +44,18 @@ class ApiAuthController extends AbstractController
            $voiture->setMarque($data['voiture']['marque']);
            $voiture->setModele($data['voiture']['modele']);
 
-            $user->setVoiture($voiture);
+           $user->setVoiture($voiture);
         }
 
-        $user
-            ->setUsername($username)
-            ->setPlainPassword($password)
-            ->setEmail($email)
+       $user->setGenre($data['genre']);
+       $user->setPrenom($data['prenom']);
+       $user->setNom($data['nom']);
+       $user->setDateNaissance(new \DateTime($data['dateNaissance']));
+
+       $user
+            ->setUsername($data['username'])
+            ->setPlainPassword($data['password'])
+            ->setEmail($data['email'])
             ->setEnabled(true)
             ->setRoles(['ROLE_USER'])
             ->setSuperAdmin(false)
