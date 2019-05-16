@@ -21,7 +21,9 @@ class ApiUserController extends AbstractController
      */
     public function afficherUtilisateur(User $user)
     {
-        $data =  $this->get('serializer')->serialize($user, 'json', ['attributes' => ['id', 'username', 'email']]);
+        $data =  $this->get('serializer')->serialize($user, 'json',
+            ['attributes' => ['id', 'username', 'email', 'nom', 'prenom', 'genre', 'dateNaissance', 'promotion',
+                'voiture' => ['modele', 'marque', 'couleur']]]);
 
         $response = new Response($data);
 
@@ -39,7 +41,9 @@ class ApiUserController extends AbstractController
             ->getRepository(User::class)
             ->findAll();
 
-        $data =  $this->get('serializer')->serialize($users, 'json', ['attributes' => ['id', 'username', 'email']]);
+        $data =  $this->get('serializer')->serialize($users, 'json',
+            ['attributes' => ['id', 'username', 'email', 'nom', 'prenom', 'genre', 'dateNaissance', 'promotion',
+                'voiture' => ['modele', 'marque', 'couleur']]]);
 
         $response = new Response($data);
         $response->headers->set('Content-Type', 'application/json');
