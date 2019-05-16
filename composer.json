@@ -18,7 +18,7 @@
         "symfony/flex": "^1.1",
         "symfony/form": "3.4.*",
         "symfony/framework-bundle": "3.4.*",
-        "symfony/monolog-bundle": "^3.1",
+        "symfony/monolog-bundle": "^3.3",
         "symfony/orm-pack": "^1.0",
         "symfony/process": "3.4.*",
         "symfony/requirements-checker": "^1.1",
