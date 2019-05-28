@@ -57,9 +57,28 @@ class ApiAnnonceController extends AbstractController
      *
      * @return Response
      */
-    public function afficherTrajet(Annonce $annonce)
+    public function afficherAnnonce(Annonce $annonce)
     {
         $data =  $this->get('serializer')->serialize($annonce, 'json', ['attributes' =>
+            [ 'id', 'titre', 'description', 'prix', 'createur', 'images']]);
+
+        $response = new Response($data);
+
+        return $response;
+    }
+
+    /**
+     * @Rest\Get("/annonces", name="liste_annonces")
+     *
+     * @return Response
+     */
+    public function listeAnnonces()
+    {
+        $annonces = $this->getDoctrine()
+            ->getRepository(Annonce::class)
+            ->findAll();
+
+        $data =  $this->get('serializer')->serialize($annonces, 'json', ['attributes' =>
             [ 'id', 'titre', 'description', 'prix', 'createur', 'images']]);
 
         $response = new Response($data);
