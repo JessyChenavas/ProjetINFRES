@@ -16,12 +16,13 @@ class Evenement {
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
+
     /**
      * @ORM\Column(type="string", length=100)
      * @Assert\NotBlank()
-     *
      */
     private $titre;
+
     /**
      * @ORM\Column(type="text")
      * @Assert\NotBlank()
@@ -52,6 +53,11 @@ class Evenement {
      * @Assert\Valid()
      */
     private $auteur;
+
+    /**
+     * @ORM\OneToOne(targetEntity="Image", cascade={"persist"})
+     */
+    private $image;
 
     /**
      * @param $date
@@ -154,5 +160,21 @@ class Evenement {
      */
     public function estAuteur(User $user = null) {
         return $user && $user->getId() === $this->getAuteur()->getId();
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getImage()
+    {
+        return $this->image;
+    }
+
+    /**
+     * @param mixed $image
+     */
+    public function setImage(Image $image)
+    {
+        $this->image = $image;
     }
 }
