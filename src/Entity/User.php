@@ -84,6 +84,8 @@ class User extends BaseUser
     public function setPromotion($promotion)
     {
         $this->promotion = $promotion;
+
+        return $this;
     }
 
     /**
@@ -100,6 +102,8 @@ class User extends BaseUser
     public function setVoiture(Voiture $voiture)
     {
         $this->voiture = $voiture;
+
+        return $this;
     }
 
     /**
@@ -116,6 +120,8 @@ class User extends BaseUser
     public function setDateNaissance($dateNaissance)
     {
         $this->dateNaissance = $dateNaissance;
+
+        return $this;
     }
 
     /**
@@ -132,6 +138,8 @@ class User extends BaseUser
     public function setGenre($genre)
     {
         $this->genre = $genre;
+
+        return $this;
     }
 
     /**
@@ -148,6 +156,8 @@ class User extends BaseUser
     public function setNom($nom)
     {
         $this->nom = $nom;
+
+        return $this;
     }
 
     /**
@@ -164,5 +174,12 @@ class User extends BaseUser
     public function setPrenom($prenom)
     {
         $this->prenom = $prenom;
+
+        return $this;
+    }
+
+    public function updateRole($role) {
+        $this->roles = array();
+        $this->addRole($role);
     }
 }

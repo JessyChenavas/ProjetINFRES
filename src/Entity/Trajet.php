@@ -92,6 +92,8 @@ class Trajet
     public function setCreateur(User $createur)
     {
         $this->createur = $createur;
+
+        return $this;
     }
 
     /**
@@ -108,6 +110,8 @@ class Trajet
     public function setLieuDepart($lieuDepart)
     {
         $this->lieuDepart = $lieuDepart;
+
+        return $this;
     }
 
     /**
@@ -124,6 +128,8 @@ class Trajet
     public function setLieuArrive($lieuArrive)
     {
         $this->lieuArrive = $lieuArrive;
+
+        return $this;
     }
 
     /**
@@ -140,6 +146,8 @@ class Trajet
     public function setHeureDepart($heureDepart)
     {
         $this->heureDepart = $heureDepart;
+
+        return $this;
     }
 
     /**
@@ -156,6 +164,8 @@ class Trajet
     public function setPassagersMax($passagersMax)
     {
         $this->passagersMax = $passagersMax;
+
+        return $this;
     }
 
     /**
@@ -198,11 +208,31 @@ class Trajet
     }
 
     /**
+     * @return mixed
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * @param mixed $id
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+
+        return $this;
+    }
+
+    /**
      * @param mixed $tarif
      */
     public function setTarif($tarif)
     {
         $this->tarif = $tarif;
+
+        return $this;
     }
 
     /**
