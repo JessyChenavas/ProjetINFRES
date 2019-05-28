@@ -26,10 +26,7 @@ class ApiAuthController extends AbstractController
      */
     public function register(Request $request, UserManagerInterface $userManager, ValidatorInterface $validator)
     {
-        $data = json_decode(
-            $request->getContent(),
-            true
-        );
+        $data = json_decode($request->getContent(), true);
 
         $user = new User();
 
@@ -47,18 +44,17 @@ class ApiAuthController extends AbstractController
            $user->setVoiture($voiture);
         }
 
-       $user->setGenre($data['genre']);
-       $user->setPrenom($data['prenom']);
-       $user->setNom($data['nom']);
-       $user->setDateNaissance(new \DateTime($data['dateNaissance']));
-
-       $user
+        $user
             ->setUsername($data['username'])
             ->setPlainPassword($data['password'])
             ->setEmail($data['email'])
             ->setEnabled(true)
             ->setRoles(['ROLE_USER'])
             ->setSuperAdmin(false)
+            ->setGenre($data['genre'])
+            ->setPrenom($data['prenom'])
+            ->setNom($data['nom'])
+            ->setDateNaissance(new \DateTime($data['dateNaissance']))
         ;
 
         $listErrors = $validator->validate($user);
@@ -72,6 +68,6 @@ class ApiAuthController extends AbstractController
             return new JsonResponse(["error" => "ERROR : ".$e->getMessage()], 500);
         }
 
-        return new JsonResponse(["success" => $user->getUsername(). " has been registered!"], 200);
+        return new JsonResponse(["success" => $user->getUsername(). " has been registered!"], 201);
     }
 }

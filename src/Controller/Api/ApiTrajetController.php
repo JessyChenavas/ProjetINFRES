@@ -27,7 +27,8 @@ class ApiTrajetController extends AbstractController
     public function afficherTrajet(Trajet $trajet)
     {
         $data =  $this->get('serializer')->serialize($trajet, 'json', ['attributes' =>
-            [ 'lieuDepart', 'lieuArrive', 'heureDepart', 'passagersMax', 'tarif', 'createur' => ['id','username','email'],  'passagers' => ['id','username','email']]]);
+            [ 'id', 'lieuDepart', 'lieuArrive', 'heureDepart', 'passagersMax', 'tarif', 'createur' => ['id', 'username', 'email', 'nom', 'prenom', 'genre', 'dateNaissance', 'promotion',
+                'voiture' => ['modele', 'marque', 'couleur']],  'passagers' => ['id','username','email']]]);
 
         $response = new Response($data);
 
@@ -46,7 +47,8 @@ class ApiTrajetController extends AbstractController
             ->findAll();
 
         $data =  $this->get('serializer')->serialize($trajets, 'json', ['attributes' =>
-            [ 'lieuDepart', 'lieuArrive', 'heureDepart', 'passagersMax', 'tarif', 'createur' => ['id','username','email'],  'passagers' => ['id','username','email']]]);
+            [ 'id', 'lieuDepart', 'lieuArrive', 'heureDepart', 'passagersMax', 'tarif', 'createur' => ['id', 'username', 'email', 'nom', 'prenom', 'genre', 'dateNaissance', 'promotion',
+                'voiture' => ['modele', 'marque', 'couleur']],  'passagers' => ['id','username','email']]]);
 
         $response = new Response($data);
 
@@ -66,12 +68,12 @@ class ApiTrajetController extends AbstractController
 
         $data = json_decode($request->getContent(), true);
 
-        $trajet->setLieuDepart($data['lieu_depart']);
-        $trajet->setLieuArrive($data['lieu_arrive']);
-        $trajet->setHeureDepart(new \DateTime($data["heure_depart"]));
-        $trajet->setPassagersMax($data['passagers_max']);
-        $trajet->setTarif($data['tarif']);
-        $trajet->setCreator($this->getUser());
+        $trajet->setLieuDepart($data['lieu_depart'])
+            ->setLieuArrive($data['lieu_arrive'])
+            ->setHeureDepart(new \DateTime($data["heure_depart"]))
+            ->setPassagersMax($data['passagers_max'])
+            ->setTarif($data['tarif'])
+            ->setCreateur($this->getUser());
 
         $listErrors = $validator->validate($trajet);
         if(count($listErrors) > 0) {
@@ -96,11 +98,11 @@ class ApiTrajetController extends AbstractController
     {
         $data = json_decode($request->getContent(), true);
 
-        $trajet->setLieuDepart($data['lieu_depart']);
-        $trajet->setLieuArrive($data['lieu_arrive']);
-        $trajet->setHeureDepart(new \DateTime($data["heure_depart"]));
-        $trajet->setPassagersMax($data['passagers_max']);
-        $trajet->setTarif($data['tarif']);
+        $trajet->setLieuDepart($data['lieu_depart'])
+            ->setLieuArrive($data['lieu_arrive'])
+            ->setHeureDepart(new \DateTime($data["heure_depart"]))
+            ->setPassagersMax($data['passagers_max'])
+            ->setTarif($data['tarif']);
 
         $listErrors = $validator->validate($trajet);
         if(count($listErrors) > 0) {
@@ -140,7 +142,7 @@ class ApiTrajetController extends AbstractController
      *  @Security("trajet.estCreateur(user) or has_role('ROLE_ADMIN')")
      */
     public function ajouterPassager(Trajet $trajet, User $user) {
-        if($trajet->getCreator()->getId() == $user->getId()) {
+        if($trajet->getCreateur()->getId() == $user->getId()) {
             return new JsonResponse(
                 ["error" => "L'ajout n'a pas été effectué : le créateur ne peut pas être passagé."],
                 409);
@@ -148,7 +150,7 @@ class ApiTrajetController extends AbstractController
 
         if ($trajet->addPassager($user)) {
             $json_response = new JsonResponse(
-                ["success" => sprintf("Le passager %s a été ajouté au trajet de %s ! ", $user->getUsername(), $trajet->getCreator()->getUsername())],
+                ["success" => sprintf("Le passager %s a été ajouté au trajet de %s ! ", $user->getUsername(), $trajet->getCreateur()->getUsername())],
                 201);
         } else {
             return new JsonResponse(
@@ -176,7 +178,7 @@ class ApiTrajetController extends AbstractController
     public function supprimerPassager(Trajet $trajet, User $user) {
         if ($trajet->removePassager($user)) {
             $json_response = new JsonResponse(
-                ["success" => sprintf("Le passager %s a été supprimé du trajet de %s ! ", $user->getUsername(), $trajet->getCreator()->getUsername())],
+                ["success" => sprintf("Le passager %s a été supprimé du trajet de %s ! ", $user->getUsername(), $trajet->getCreateur()->getUsername())],
                 200);
         } else {
             $json_response = new JsonResponse(
