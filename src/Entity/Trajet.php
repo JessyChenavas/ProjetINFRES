@@ -7,6 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Validator\Constraints as Assert;
 
+
 /**
  * @ORM\Entity
  * @ORM\Table(name="trajet")
@@ -25,7 +26,7 @@ class Trajet
      * @ORM\JoinColumn(nullable=false)
      * @Assert\Valid()
      */
-    private $creator;
+    private $createur;
 
     /**
      * @ORM\Column(type="string", length=100)
@@ -80,17 +81,17 @@ class Trajet
     /**
      * @return mixed
      */
-    public function getCreator()
+    public function getCreateur()
     {
-        return $this->creator;
+        return $this->createur;
     }
 
     /**
-     * @param mixed $creator
+     * @param mixed $createur
      */
-    public function setCreator(User $creator)
+    public function setCreateur(User $createur)
     {
-        $this->creator = $creator;
+        $this->createur = $createur;
     }
 
     /**
@@ -209,5 +210,12 @@ class Trajet
      */
     public function estPlein() {
         return $this->passagers->count() >= $this->passagersMax;
+    }
+
+    /**
+     * @return bool
+     */
+    public function estCreateur(User $user = null) {
+        return $user && $user->getId() === $this->getCreateur()->getId();
     }
 }

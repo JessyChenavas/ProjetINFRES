@@ -3,6 +3,8 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
+use App\Entity\User;
+
 /**
  * @ORM\Entity
  * @ORM\Table(name="evenement")
@@ -43,6 +45,13 @@ class Evenement {
      *     message = "Merci de renseigner une date valable (au moins 30 minutes après la date actuelle)")
      */
     private $date;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="User", cascade={"persist"}, fetch="EAGER")
+     * @ORM\JoinColumn(nullable=false)
+     * @Assert\Valid()
+     */
+    private $auteur;
 
     /**
      * @param $date
@@ -122,5 +131,28 @@ class Evenement {
     public function setDescription($description)
     {
         $this->description = $description;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getAuteur()
+    {
+        return $this->auteur;
+    }
+
+    /**
+     * @param mixed $author
+     */
+    public function setAuteur(User $auteur)
+    {
+        $this->auteur = $auteur;
+    }
+
+    /**
+     * @return bool
+     */
+    public function estAuteur(User $user = null) {
+        return $user && $user->getId() === $this->getAuteur()->getId();
     }
 }
