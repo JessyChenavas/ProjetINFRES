@@ -12,6 +12,7 @@ use FOS\RestBundle\Controller\Annotations as Rest;
 use Symfony\Component\Routing\Annotation\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 
 /**
  * @Route("/api", name="api_")
@@ -19,9 +20,45 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 class ApiTrajetController extends AbstractController
 {
     /**
+     * @Rest\Get("/trajet/{id}", name="afficher_trajet")
+     *
+     * @return Response
+     */
+    public function afficherTrajet(Trajet $trajet)
+    {
+        $data =  $this->get('serializer')->serialize($trajet, 'json', ['attributes' =>
+            [ 'lieuDepart', 'lieuArrive', 'heureDepart', 'passagersMax', 'tarif', 'createur' => ['id','username','email'],  'passagers' => ['id','username','email']]]);
+
+        $response = new Response($data);
+
+        return $response;
+    }
+
+    /**
+     * @Rest\Get("/trajets", name="liste_trajets")
+     *
+     * @return Response
+     */
+    public function listeTrajets()
+    {
+        $trajets = $this->getDoctrine()
+            ->getRepository(Trajet::class)
+            ->findAll();
+
+        $data =  $this->get('serializer')->serialize($trajets, 'json', ['attributes' =>
+            [ 'lieuDepart', 'lieuArrive', 'heureDepart', 'passagersMax', 'tarif', 'createur' => ['id','username','email'],  'passagers' => ['id','username','email']]]);
+
+        $response = new Response($data);
+
+        return $response;
+    }
+
+    /**
      *  @Rest\Post("/trajets", name="creer_trajet")
      *
      *  @return JsonResponse
+     *
+     *  @Security("has_role('ROLE_USER')")
      */
     public function creerTrajet(Request $request, ValidatorInterface $validator)
     {
@@ -29,16 +66,12 @@ class ApiTrajetController extends AbstractController
 
         $data = json_decode($request->getContent(), true);
 
-        $user = $this->getDoctrine()
-            ->getRepository("App\Entity\User")
-            ->find($data['creator_id']);
-
         $trajet->setLieuDepart($data['lieu_depart']);
         $trajet->setLieuArrive($data['lieu_arrive']);
         $trajet->setHeureDepart(new \DateTime($data["heure_depart"]));
         $trajet->setPassagersMax($data['passagers_max']);
         $trajet->setTarif($data['tarif']);
-        $trajet->setCreator($user);
+        $trajet->setCreator($this->getUser());
 
         $listErrors = $validator->validate($trajet);
         if(count($listErrors) > 0) {
@@ -56,6 +89,8 @@ class ApiTrajetController extends AbstractController
      *  @Rest\Put("/trajet/{id}", name="modifier_trajet")
      *
      *  @return JsonResponse
+     *
+     *  @Security("trajet.estCreateur(user) or has_role('ROLE_ADMIN')")
      */
     public function modifierTrajet(Request $request, Trajet $trajet, ValidatorInterface $validator)
     {
@@ -83,6 +118,8 @@ class ApiTrajetController extends AbstractController
      *  @Rest\Delete("/trajet/{id}", name="supprimer_trajet")
      *
      *  @return JsonResponse
+     *
+     *  @Security("trajet.estCreateur(user) or has_role('ROLE_ADMIN')")
      */
     public function supprimerTrajet(Trajet $trajet) {
         $em = $this->getDoctrine()->getManager();
@@ -99,6 +136,8 @@ class ApiTrajetController extends AbstractController
      *  @ParamConverter("user", options={"mapping": {"passager_id": "id"}})
      *
      *  @return JsonResponse
+     *
+     *  @Security("trajet.estCreateur(user) or has_role('ROLE_ADMIN')")
      */
     public function ajouterPassager(Trajet $trajet, User $user) {
         if($trajet->getCreator()->getId() == $user->getId()) {
@@ -131,6 +170,8 @@ class ApiTrajetController extends AbstractController
      *  @ParamConverter("user", options={"mapping": {"passager_id": "id"}})
      *
      *  @return JsonResponse
+     *
+     *  @Security("trajet.estCreateur(user) or has_role('ROLE_ADMIN')")
      */
     public function supprimerPassager(Trajet $trajet, User $user) {
         if ($trajet->removePassager($user)) {
@@ -148,39 +189,5 @@ class ApiTrajetController extends AbstractController
         $em->flush();
 
         return $json_response;
-    }
-
-    /**
-     * @Rest\Get("/trajet/{id}", name="afficher_trajet")
-     *
-     * @return Response
-     */
-    public function afficherTrajet(Trajet $trajet)
-    {
-        $data =  $this->get('serializer')->serialize($trajet, 'json', ['attributes' =>
-            [ 'lieuDepart', 'lieuArrive', 'heureDepart', 'passagersMax', 'tarif', 'creator' => ['id','username','email'],  'passagers' => ['id','username','email']]]);
-
-        $response = new Response($data);
-
-        return $response;
-    }
-
-    /**
-     * @Rest\Get("/trajets", name="liste_trajets")
-     *
-     * @return Response
-     */
-    public function listeTrajets()
-    {
-        $trajets = $this->getDoctrine()
-            ->getRepository(Trajet::class)
-            ->findAll();
-
-        $data =  $this->get('serializer')->serialize($trajets, 'json', ['attributes' =>
-            [ 'lieuDepart', 'lieuArrive', 'heureDepart', 'passagersMax', 'tarif', 'creator' => ['id','username','email'],  'passagers' => ['id','username','email']]]);
-
-        $response = new Response($data);
-
-        return $response;
     }
 }

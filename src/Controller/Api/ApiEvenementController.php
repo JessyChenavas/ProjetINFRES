@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\Request;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use Symfony\Component\Routing\Annotation\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 
 /**
  * @Route("/api", name="api_")
@@ -28,7 +29,7 @@ class ApiEvenementController extends AbstractController
         $events = $repository->findall();
 
         $data =  $this->get('serializer')->serialize($events, 'json', ['attributes' =>
-            [ 'titre', 'description', 'lieu', 'date']]);
+            [ 'id', 'titre', 'description', 'lieu', 'date', 'auteur' => ['id','username','email']]]);
 
         $response = new Response($data);
         return $response;
@@ -42,7 +43,7 @@ class ApiEvenementController extends AbstractController
     public function afficherEvenement(Evenement $event)
     {
         $data =  $this->get('serializer')->serialize($event, 'json', ['attributes' =>
-            [ 'titre', 'description', 'lieu', 'date']]);
+            [ 'id', 'titre', 'description', 'lieu', 'date', 'auteur' => ['id','username','email']]]);
 
         $response = new Response($data);
         return $response;
@@ -53,6 +54,9 @@ class ApiEvenementController extends AbstractController
      * @Rest\Post("/event", name="creer_evenement")
      *
      * @return JsonResponse
+     *
+     * @Security("has_role('ROLE_EDITOR')")
+     *
      */
     public function creerEvenement(Request $request)
     {
@@ -62,6 +66,7 @@ class ApiEvenementController extends AbstractController
         $form->submit($data);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $event->setAuteur($this->getUser());
             $em = $this->getDoctrine()->getManager();
             $em->persist($event);
             $em->flush();
@@ -75,6 +80,8 @@ class ApiEvenementController extends AbstractController
      * @Rest\Put("/event/{id}", name="modifier_evenement")
      *
      * @return JsonResponse
+     *
+     * @Security("event.estAuteur(user) or has_role('ROLE_ADMIN')")
      */
     public function modifierEvenement(Request $request, Evenement $event)
     {
@@ -96,6 +103,9 @@ class ApiEvenementController extends AbstractController
      *  @Rest\Delete("/event/{id}", name="supprimer_evenement")
      *
      *  @return JsonResponse
+     *
+     *  @Security("event.estAuteur(user) or has_role('ROLE_ADMIN')")
+     *
      */
     public function supprimerEvenement(Evenement $event) {
         $em = $this->getDoctrine()->getManager();
