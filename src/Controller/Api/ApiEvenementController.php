@@ -37,7 +37,7 @@ class ApiEvenementController extends AbstractController
     }
 
     /**
-     * @Rest\Get("/event/{id}", name="afficher_evenement")
+     * @Rest\Get("/events/{id}", name="afficher_evenement")
      *
      * @return Response
      */
@@ -52,7 +52,7 @@ class ApiEvenementController extends AbstractController
 
 
     /**
-     * @Rest\Post("/event", name="creer_evenement")
+     * @Rest\Post("/events", name="creer_evenement")
      *
      * @return JsonResponse
      *
@@ -87,7 +87,7 @@ class ApiEvenementController extends AbstractController
     }
 
     /**
-     * @Rest\Put("/event/{id}", name="modifier_evenement")
+     * @Rest\Put("/events/{id}", name="modifier_evenement")
      *
      * @return JsonResponse
      *
@@ -110,7 +110,7 @@ class ApiEvenementController extends AbstractController
     }
 
     /**
-     *  @Rest\Delete("/event/{id}", name="supprimer_evenement")
+     *  @Rest\Delete("/events/{id}", name="supprimer_evenement")
      *
      *  @return JsonResponse
      *

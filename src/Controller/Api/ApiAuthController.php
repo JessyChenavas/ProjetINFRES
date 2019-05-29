@@ -21,7 +21,6 @@ class ApiAuthController extends AbstractController
 {
     /**
      * @Rest\Post("/register")
-
      * @return JsonResponse
      */
     public function register(Request $request, UserManagerInterface $userManager, ValidatorInterface $validator)
@@ -54,8 +53,7 @@ class ApiAuthController extends AbstractController
             ->setGenre($data['genre'])
             ->setPrenom($data['prenom'])
             ->setNom($data['nom'])
-            ->setDateNaissance(new \DateTime($data['dateNaissance']))
-        ;
+            ->setDateNaissance(new \DateTime($data['dateNaissance']));
 
         $listErrors = $validator->validate($user);
         if(count($listErrors) > 0) {

@@ -20,7 +20,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 class ApiTrajetController extends AbstractController
 {
     /**
-     * @Rest\Get("/trajet/{id}", name="afficher_trajet")
+     * @Rest\Get("/trajets/{id}", name="afficher_trajet")
      *
      * @return Response
      */
@@ -55,6 +55,8 @@ class ApiTrajetController extends AbstractController
         return $response;
     }
 
+
+
     /**
      *  @Rest\Post("/trajets", name="creer_trajet")
      *
@@ -88,7 +90,7 @@ class ApiTrajetController extends AbstractController
     }
 
     /**
-     *  @Rest\Put("/trajet/{id}", name="modifier_trajet")
+     *  @Rest\Put("/trajets/{id}", name="modifier_trajet")
      *
      *  @return JsonResponse
      *
@@ -117,7 +119,7 @@ class ApiTrajetController extends AbstractController
     }
 
     /**
-     *  @Rest\Delete("/trajet/{id}", name="supprimer_trajet")
+     *  @Rest\Delete("/trajets/{id}", name="supprimer_trajet")
      *
      *  @return JsonResponse
      *
@@ -132,7 +134,7 @@ class ApiTrajetController extends AbstractController
     }
 
     /**
-     *  @Rest\Post("/trajet/{trajet_id}/passager/{passager_id}", name="ajouter_passager")
+     *  @Rest\Post("/trajets/{trajet_id}/passagers/{passager_id}", name="ajouter_passager")
      *
      *  @ParamConverter("trajet", options={"mapping": {"trajet_id": "id"}})
      *  @ParamConverter("user", options={"mapping": {"passager_id": "id"}})
@@ -166,7 +168,7 @@ class ApiTrajetController extends AbstractController
     }
 
     /**
-     *  @Rest\Delete("/trajet/{trajet_id}/passager/{passager_id}", name="supprimer_passager")
+     *  @Rest\Delete("/trajets/{trajet_id}/passagers/{passager_id}", name="supprimer_passager")
      *
      *  @ParamConverter("trajet", options={"mapping": {"trajet_id": "id"}})
      *  @ParamConverter("user", options={"mapping": {"passager_id": "id"}})

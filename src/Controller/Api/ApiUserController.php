@@ -22,7 +22,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 class ApiUserController extends AbstractController
 {
     /**
-     * @Rest\Get("/user/{id}", name="afficher_utlisateur")
+     * @Rest\Get("/users/{id}", name="afficher_utlisateur")
      *
      * @return Response
      */
@@ -59,7 +59,7 @@ class ApiUserController extends AbstractController
     }
 
     /**
-     *  @Rest\Put("/user/{id}", name="modifier_utilisateur")
+     *  @Rest\Put("/users/{id}", name="modifier_utilisateur")
      *
      *  @return JsonResponse
      *

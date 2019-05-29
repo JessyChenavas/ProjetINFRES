@@ -20,7 +20,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 class ApiAnnonceController extends AbstractController
 {
     /**
-     *  @Rest\Post("/annonce", name="creer_annonce")
+     *  @Rest\Post("/annonces", name="creer_annonce")
      *
      *  @return JsonResponse
      *
@@ -53,7 +53,7 @@ class ApiAnnonceController extends AbstractController
     }
 
     /**
-     * @Rest\Get("/annonce/{id}", name="afficher_annonce")
+     * @Rest\Get("/annonces/{id}", name="afficher_annonce")
      *
      * @return Response
      */
