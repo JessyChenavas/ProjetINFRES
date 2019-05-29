@@ -17,7 +17,6 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
  * @Route("/api", name="api_")
- * @Security("has_role('ROLE_USER')")
  */
 class ApiUserController extends AbstractController
 {
