@@ -55,14 +55,12 @@ class ApiTrajetController extends AbstractController
         return $response;
     }
 
-
-
     /**
      *  @Rest\Post("/trajets", name="creer_trajet")
      *
      *  @return JsonResponse
      *
-     *  @Security("has_role('ROLE_USER')")
+     *  @Security("is_granted('ROLE_USER')", statusCode=401, message="Vous devez être connecté pour effectuer cette action")
      */
     public function creerTrajet(Request $request, ValidatorInterface $validator)
     {
@@ -94,7 +92,7 @@ class ApiTrajetController extends AbstractController
      *
      *  @return JsonResponse
      *
-     *  @Security("trajet.estCreateur(user) or has_role('ROLE_ADMIN')")
+     *  @Security("trajet.estCreateur(user) or is_granted('ROLE_ADMIN')", statusCode=403, message="Seul le créateur du trajet peut effectuer cette action !")
      */
     public function modifierTrajet(Request $request, Trajet $trajet, ValidatorInterface $validator)
     {
@@ -123,7 +121,7 @@ class ApiTrajetController extends AbstractController
      *
      *  @return JsonResponse
      *
-     *  @Security("trajet.estCreateur(user) or has_role('ROLE_ADMIN')")
+     *  @Security("trajet.estCreateur(user) or is_granted('ROLE_ADMIN')", statusCode=403, message="Seul le créateur du trajet peut effectuer cette action !")
      */
     public function supprimerTrajet(Trajet $trajet) {
         $em = $this->getDoctrine()->getManager();
@@ -141,7 +139,7 @@ class ApiTrajetController extends AbstractController
      *
      *  @return JsonResponse
      *
-     *  @Security("trajet.estCreateur(user) or has_role('ROLE_ADMIN')")
+     *  @Security("trajet.estCreateur(user) or is_granted('ROLE_ADMIN')", statusCode=403, message="Seul le créateur du trajet peut effectuer cette action !")
      */
     public function ajouterPassager(Trajet $trajet, User $user) {
         if($trajet->getCreateur()->getId() == $user->getId()) {
@@ -175,7 +173,7 @@ class ApiTrajetController extends AbstractController
      *
      *  @return JsonResponse
      *
-     *  @Security("trajet.estCreateur(user) or has_role('ROLE_ADMIN')")
+     *  @Security("trajet.estCreateur(user) or is_granted('ROLE_ADMIN')", statusCode=403, message="Seul le créateur du trajet peut effectuer cette action !")
      */
     public function supprimerPassager(Trajet $trajet, User $user) {
         if ($trajet->removePassager($user)) {

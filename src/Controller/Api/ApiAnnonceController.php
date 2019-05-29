@@ -20,39 +20,6 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 class ApiAnnonceController extends AbstractController
 {
     /**
-     *  @Rest\Post("/annonces", name="creer_annonce")
-     *
-     *  @return JsonResponse
-     *
-     *  @Security("has_role('ROLE_USER')")
-     */
-    public function creerAnnonce(Request $request) {
-        $annonce = new Annonce();
-
-        $data = json_decode($request->getContent(), true);
-        $em = $this->getDoctrine()->getManager();
-
-        foreach ($data['images'] as $i) {
-            $image = new Image();
-            $image->setUrl($i['url']);
-            $image->setAlt($i['alt']);
-
-            $em->persist($image);
-            $annonce->addImage($image);
-        }
-
-        $annonce->setCreateur($this->getUser())
-            ->setDescription($data['description'])
-            ->setPrix($data['prix'])
-            ->setTitre($data['titre']);
-
-        $em->persist($annonce);
-        $em->flush();
-
-        return new JsonResponse(["success" => "L'annonce est enregistrée !"], 201);
-    }
-
-    /**
      * @Rest\Get("/annonces/{id}", name="afficher_annonce")
      *
      * @return Response
@@ -86,4 +53,36 @@ class ApiAnnonceController extends AbstractController
         return $response;
     }
 
+    /**
+     *  @Rest\Post("/annonces", name="creer_annonce")
+     *
+     *  @return JsonResponse
+     *
+     *  @Security("is_granted('ROLE_USER')", statusCode=401, message="Vous devez être connecté pour effectuer cette action !")
+     */
+    public function creerAnnonce(Request $request) {
+        $annonce = new Annonce();
+
+        $data = json_decode($request->getContent(), true);
+        $em = $this->getDoctrine()->getManager();
+
+        foreach ($data['images'] as $i) {
+            $image = new Image();
+            $image->setUrl($i['url']);
+            $image->setAlt($i['alt']);
+
+            $em->persist($image);
+            $annonce->addImage($image);
+        }
+
+        $annonce->setCreateur($this->getUser())
+            ->setDescription($data['description'])
+            ->setPrix($data['prix'])
+            ->setTitre($data['titre']);
+
+        $em->persist($annonce);
+        $em->flush();
+
+        return new JsonResponse(["success" => "L'annonce est enregistrée !"], 201);
+    }
 }

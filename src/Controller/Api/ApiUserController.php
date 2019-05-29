@@ -62,7 +62,7 @@ class ApiUserController extends AbstractController
      *
      *  @return JsonResponse
      *
-     *  @Security("has_role('ROLE_USER')")
+     *  @Security("is_granted('ROLE_USER')", statusCode=401, message="Vous devez être connecté pour effectuer cette action !"))
      */
     public function modifierUtilisateur(Request $request, User $user, ValidatorInterface $validator, UserManagerInterface $userManager) {
         $data = json_decode($request->getContent(), true);

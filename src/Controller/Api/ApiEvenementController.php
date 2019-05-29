@@ -50,14 +50,12 @@ class ApiEvenementController extends AbstractController
         return $response;
     }
 
-
     /**
      * @Rest\Post("/events", name="creer_evenement")
      *
      * @return JsonResponse
      *
-     * @Security("has_role('ROLE_EDITOR')")
-     *
+     * @Security("is_granted('ROLE_EDITOR')", statusCode=403, message="Vous devez être éditeur pour pouvoir créer un évènement !")
      */
     public function creerEvenement(Request $request)
     {
@@ -91,7 +89,7 @@ class ApiEvenementController extends AbstractController
      *
      * @return JsonResponse
      *
-     * @Security("event.estAuteur(user) or has_role('ROLE_ADMIN')")
+     * @Security("event.estAuteur(user) or is_granted('ROLE_ADMIN')", statusCode=403, message="Seul le créateur de l'évènement peut effectuer cette action !")
      */
     public function modifierEvenement(Request $request, Evenement $event)
     {
@@ -114,7 +112,7 @@ class ApiEvenementController extends AbstractController
      *
      *  @return JsonResponse
      *
-     *  @Security("event.estAuteur(user) or has_role('ROLE_ADMIN')")
+     *  @Security("event.estAuteur(user) or is_granted('ROLE_ADMIN')", statusCode=403, message="Seul le créateur de l'évènement peut effectuer cette action !"))
      *
      */
     public function supprimerEvenement(Evenement $event) {
