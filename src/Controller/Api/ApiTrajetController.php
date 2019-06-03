@@ -36,6 +36,44 @@ class ApiTrajetController extends AbstractController
     }
 
     /**
+     * @Rest\Get("/trajets/users/{id}", name="afficher_trajets_utilisateur")
+     *
+     * @return Response
+     */
+    public function afficherTrajetParUtilisateur(User $user) {
+        $trajets = $this->getDoctrine()
+            ->getRepository(Trajet::class)
+            ->findBy(['createur' => $user]);
+
+        $data =  $this->get('serializer')->serialize($trajets, 'json', ['attributes' =>
+            [ 'id', 'lieuDepart', 'lieuArrive', 'heureDepart', 'passagersMax', 'tarif', 'createur' => ['id', 'username', 'email', 'nom', 'prenom', 'genre', 'dateNaissance', 'promotion',
+                'voiture' => ['modele', 'marque', 'couleur']],  'passagers' => ['id','username','email']]]);
+
+        $response = new Response($data);
+
+        return $response;
+    }
+
+    /**
+     * @Rest\Get("/trajets/depart/{depart}/arrive/{arrive}", name="afficher_trajets_lieu_depart_arrive")
+     *
+     * @return Response
+     */
+    public function afficherTrajetParLieuDepartArrive(string $depart, string $arrive) {
+        $trajets = $this->getDoctrine()
+            ->getRepository(Trajet::class)
+            ->findBy(['lieuDepart' => $depart, 'lieuArrive' => $arrive]);
+
+        $data =  $this->get('serializer')->serialize($trajets, 'json', ['attributes' =>
+            [ 'id', 'lieuDepart', 'lieuArrive', 'heureDepart', 'passagersMax', 'tarif', 'createur' => ['id', 'username', 'email', 'nom', 'prenom', 'genre', 'dateNaissance', 'promotion',
+                'voiture' => ['modele', 'marque', 'couleur']],  'passagers' => ['id','username','email']]]);
+
+        $response = new Response($data);
+
+        return $response;
+    }
+
+    /**
      * @Rest\Get("/trajets", name="liste_trajets")
      *
      * @return Response
@@ -92,6 +130,7 @@ class ApiTrajetController extends AbstractController
      *
      *  @return JsonResponse
      *
+     *  @Security("is_granted('IS_AUTHENTICATED_FULLY')", statusCode=401, message="Vous devez être connecté pour effectuer cette action !"))
      *  @Security("trajet.estCreateur(user) or is_granted('ROLE_ADMIN')", statusCode=403, message="Seul le créateur du trajet peut effectuer cette action !")
      */
     public function modifierTrajet(Request $request, Trajet $trajet, ValidatorInterface $validator)
@@ -121,6 +160,7 @@ class ApiTrajetController extends AbstractController
      *
      *  @return JsonResponse
      *
+     *  @Security("is_granted('IS_AUTHENTICATED_FULLY')", statusCode=401, message="Vous devez être connecté pour effectuer cette action !"))
      *  @Security("trajet.estCreateur(user) or is_granted('ROLE_ADMIN')", statusCode=403, message="Seul le créateur du trajet peut effectuer cette action !")
      */
     public function supprimerTrajet(Trajet $trajet) {
@@ -139,6 +179,7 @@ class ApiTrajetController extends AbstractController
      *
      *  @return JsonResponse
      *
+     *  @Security("is_granted('IS_AUTHENTICATED_FULLY')", statusCode=401, message="Vous devez être connecté pour effectuer cette action !"))
      *  @Security("trajet.estCreateur(user) or is_granted('ROLE_ADMIN')", statusCode=403, message="Seul le créateur du trajet peut effectuer cette action !")
      */
     public function ajouterPassager(Trajet $trajet, User $user) {
@@ -173,6 +214,7 @@ class ApiTrajetController extends AbstractController
      *
      *  @return JsonResponse
      *
+     *  @Security("is_granted('IS_AUTHENTICATED_FULLY')", statusCode=401, message="Vous devez être connecté pour effectuer cette action !"))
      *  @Security("trajet.estCreateur(user) or is_granted('ROLE_ADMIN')", statusCode=403, message="Seul le créateur du trajet peut effectuer cette action !")
      */
     public function supprimerPassager(Trajet $trajet, User $user) {
