@@ -88,6 +88,10 @@ class Annonce
         return $this;
     }
 
+    public function estCreateur(User $user = null) {
+        return $user && $user->getId() === $this->getCreateur()->getId();
+    }
+
     /**
      * @return mixed
      */
@@ -150,11 +154,16 @@ class Annonce
         return $this->images;
     }
 
-    public function addImage(Image $image) {
-        $this->images[] = $image;
+    public function addImage(Image $image)
+    {
+        if (!$this->getImages()->contains($image)) {
+            $this->images[] = $image;
+        }
     }
 
     public function removeImage(Image $image) {
-        $this->images->removeElement($image);
+        if ($this->getImages()->contains($image)) {
+            $this->images->removeElement($image);
+        }
     }
 }
