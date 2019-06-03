@@ -69,10 +69,17 @@ class ApiEvenementController extends AbstractController
             $event->setAuteur($this->getUser());
 
             if (isset($data['image'])) {
-                $image = new Image();
-                $image->setUrl($data['image']['url']);
-                $image->setAlt($data['image']['alt']);
-                $em->persist($image);
+                $image = $this->getDoctrine()
+                    ->getRepository(Image::class)
+                    ->findOneBy(['url' => $data['image']['url'], 'alt' => $data['image']['alt']]);
+
+                if (!$image) {
+                    $image = new Image();
+                    $image->setUrl($data['image']['url']);
+                    $image->setAlt($data['image']['alt']);
+                    $em->persist($image);
+                }
+
                 $event->setImage($image);
             }
 
@@ -94,12 +101,27 @@ class ApiEvenementController extends AbstractController
      */
     public function modifierEvenement(Request $request, Evenement $event)
     {
+        $em = $this->getDoctrine()->getManager();
         $form = $this->createForm(EvenementType::class, $event);
         $data = json_decode($request->getContent(), true);
         $form->submit($data);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            if (isset($data['image'])) {
+                $image = $this->getDoctrine()
+                    ->getRepository(Image::class)
+                    ->findOneBy(['url' => $data['image']['url'], 'alt' => $data['image']['alt']]);
+
+                if (!$image) {
+                    $image = new Image();
+                    $image->setUrl($data['image']['url']);
+                    $image->setAlt($data['image']['alt']);
+                    $em->persist($image);
+                }
+
+                $event->setImage($image);
+            }
+
             $em->persist($event);
             $em->flush();
             return new JsonResponse(['success' => sprintf('L\'évènement %s a bien été modifié !', $data['titre'])], 200);
