@@ -19,7 +19,7 @@ class EvenementType extends AbstractType
             ->add('date', DateTimeType::class, [
                 'widget' => 'single_text'])
             ->add('save', SubmitType::class)
-            ->add('image', ImageType::class)
+            ->add('image', ImageType::class, ['required' => false])
         ;
     }
     public function configureOptions(OptionsResolver $resolver)

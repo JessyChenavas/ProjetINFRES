@@ -55,7 +55,9 @@ class Evenement {
     private $auteur;
 
     /**
-     * @ORM\OneToOne(targetEntity="Image", cascade={"persist"})
+     * @ORM\ManyToOne(targetEntity="Image", cascade={"persist"}, fetch="EAGER")
+     * @ORM\JoinColumn(nullable=true)
+     * @Assert\Valid()
      */
     private $image;
 
