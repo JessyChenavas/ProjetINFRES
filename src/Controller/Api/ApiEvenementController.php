@@ -89,6 +89,7 @@ class ApiEvenementController extends AbstractController
      *
      * @return JsonResponse
      *
+     * @Security("is_granted('IS_AUTHENTICATED_FULLY')", statusCode=401, message="Vous devez être connecté pour effectuer cette action !"))
      * @Security("event.estAuteur(user) or is_granted('ROLE_ADMIN')", statusCode=403, message="Seul le créateur de l'évènement peut effectuer cette action !")
      */
     public function modifierEvenement(Request $request, Evenement $event)
@@ -112,6 +113,7 @@ class ApiEvenementController extends AbstractController
      *
      *  @return JsonResponse
      *
+     *  @Security("is_granted('IS_AUTHENTICATED_FULLY')", statusCode=401, message="Vous devez être connecté pour effectuer cette action !"))
      *  @Security("event.estAuteur(user) or is_granted('ROLE_ADMIN')", statusCode=403, message="Seul le créateur de l'évènement peut effectuer cette action !"))
      *
      */
