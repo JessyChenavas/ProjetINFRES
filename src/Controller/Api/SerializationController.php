@@ -4,6 +4,12 @@ namespace App\Controller\Api;
 
 class SerializationController
 {
+    private $user_resume =  ['id', 'username', 'email', 'roles', 'nom', 'prenom', 'genre', 'dateNaissance', 'promotion'];
+
+    private $user_detail = ['id', 'username', 'email', 'roles', 'nom', 'prenom', 'genre', 'dateNaissance', 'promotion',
+    'voiture' => ['modele', 'marque', 'couleur']];
+
+
     public function serialize(string $entity, bool $paginated = false) {
 
         $serialization = array();
@@ -11,26 +17,23 @@ class SerializationController
         switch ($entity) {
 
             case 'user':
-                $serialization = ['id', 'username', 'email', 'roles', 'nom', 'prenom', 'genre', 'dateNaissance', 'promotion',
-                    'voiture' => ['modele', 'marque', 'couleur']];
+                $serialization = $this->user_detail;
                 break;
 
             case 'conversation':
-                $serialization = ['id', 'messages' => ['texte', 'date', 'auteur' => ['username']], 'participants' => ['id', 'username', 'email', 'roles', 'nom', 'prenom', 'genre', 'dateNaissance', 'promotion',
-                    'voiture' => ['modele', 'marque', 'couleur']]];
+                $serialization = ['id', 'messages' => ['texte', 'date', 'auteur' => ['username']], 'participants' => $this->user_resume];
                 break;
 
             case 'trajet':
-                $serialization = [ 'id', 'lieuDepart', 'lieuArrive', 'heureDepart', 'passagersMax', 'tarif', 'createur' => ['id', 'username', 'email', 'nom', 'prenom', 'genre', 'dateNaissance', 'promotion',
-                    'voiture' => ['modele', 'marque', 'couleur']],  'passagers' => ['id','username','email']];
+                $serialization = [ 'id', 'lieuDepart', 'lieuArrive', 'heureDepart', 'passagersMax', 'tarif', 'createur' => $this->user_detail,  'passagers' => $this->user_resume ];
                 break;
 
             case 'evenement':
-                $serialization = [ 'id', 'titre', 'description', 'lieu', 'date', 'image', 'auteur' => ['id','username','email']];
+                $serialization = [ 'id', 'titre', 'description', 'lieu', 'date', 'image', 'auteur' => $this->user_resume ];
                 break;
 
             case 'annonce':
-                $serialization = [ 'id', 'titre', 'description', 'prix', 'images', 'createur' => ['id', 'username', 'email', 'nom', 'prenom', 'promotion']];
+                $serialization = [ 'id', 'titre', 'description', 'prix', 'images', 'createur' => $this->user_resume ];
                 break;
         }
 
