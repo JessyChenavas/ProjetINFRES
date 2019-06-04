@@ -5,9 +5,8 @@ namespace App\Controller\Api;
 use App\Entity\PaginatedCollection;
 use Pagerfanta\Adapter\ArrayAdapter;
 use Pagerfanta\Pagerfanta;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-class PaginatingController extends AbstractController
+class PaginatingController
 {
     public function paginate(array $entities, $page, $limit) {
         $adapter = new ArrayAdapter($entities);
