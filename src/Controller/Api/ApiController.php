@@ -6,11 +6,12 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class ApiController extends AbstractController
 {
-    public function getSerializer() {
-        return new SerializationController();
-    }
+    protected $serializer;
+    protected $paginator;
 
-    public function getPaginator() {
-        return new PaginatingController();
+    public function __construct()
+    {
+        $this->serializer = new SerializationController();
+        $this->paginator = new PaginatingController();
     }
 }

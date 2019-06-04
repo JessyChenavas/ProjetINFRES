@@ -24,7 +24,7 @@ class ApiAnnonceController extends ApiController
      */
     public function afficherAnnonce(Annonce $annonce)
     {
-        $data =  $this->get('serializer')->serialize($annonce, 'json', $this->getSerializer()->serialize('annonce'));
+        $data =  $this->get('serializer')->serialize($annonce, 'json', $this->serializer->serialize('annonce'));
 
         return new Response($data);
     }
@@ -41,8 +41,8 @@ class ApiAnnonceController extends ApiController
             ->getRepository(Annonce::class)
             ->findAll();
 
-        $paginatedCollection = $this->getPaginator()->paginate($annonces, $page, 10);
-        $serialization = $this->getSerializer()->serialize('annonce', true);
+        $paginatedCollection = $this->paginator->paginate($annonces, $page, 10);
+        $serialization = $this->serializer->serialize('annonce', true);
 
         $data =  $this->get('serializer')->serialize($paginatedCollection, 'json', $serialization);
 

@@ -30,8 +30,8 @@ class ApiEvenementController extends ApiController
             ->getRepository(Evenement::class)
             ->findAll();
 
-        $paginatedCollection = $this->getPaginator()->paginate($events, $page, 5);
-        $serialization = $this->getSerializer()->serialize('evenement', true);
+        $paginatedCollection = $this->paginator->paginate($events, $page, 5);
+        $serialization = $this->serializer->serialize('evenement', true);
 
         $data =  $this->get('serializer')->serialize($paginatedCollection, 'json', $serialization);
 
@@ -45,7 +45,7 @@ class ApiEvenementController extends ApiController
      */
     public function afficherEvenement(Evenement $event)
     {
-        $data =  $this->get('serializer')->serialize($event, 'json', $this->getSerializer()->serialize('evenement'));
+        $data =  $this->get('serializer')->serialize($event, 'json', $this->serializer->serialize('evenement'));
 
         return new Response($data);
     }

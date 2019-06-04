@@ -28,7 +28,7 @@ class ApiUserController extends ApiController
      */
     public function afficherUtilisateur(User $user)
     {
-        $data =  $this->get('serializer')->serialize($user, 'json', $this->getSerializer()->serialize('user'));
+        $data =  $this->get('serializer')->serialize($user, 'json', $this->serializer->serialize('user'));
 
         return new Response($data);
     }
@@ -45,8 +45,8 @@ class ApiUserController extends ApiController
             ->getRepository(User::class)
             ->findAll();
 
-        $paginatedCollection = $this->getPaginator()->paginate($users, $page, 5);
-        $serialization = $this->getSerializer()->serialize('user', true);
+        $paginatedCollection = $this->paginator->paginate($users, $page, 5);
+        $serialization = $this->serializer->serialize('user', true);
 
         $data = $this->get('serializer')->serialize($paginatedCollection, 'json', $serialization);
 
@@ -159,7 +159,7 @@ class ApiUserController extends ApiController
      *  @Security("conversation.estMembre(user) or is_granted('ROLE_ADMIN')", statusCode=403, message="Seuls les membres de la conversation peuvent effectuer cette action !"))
      */
     public function afficherConversation(Conversation $conversation) {
-        $data =  $this->get('serializer')->serialize($conversation, 'json', $this->getSerializer()->serialize('conversation'));
+        $data =  $this->get('serializer')->serialize($conversation, 'json', $this->serializer->serialize('conversation'));
 
         return new Response($data);
     }
@@ -178,8 +178,8 @@ class ApiUserController extends ApiController
             ->getRepository(Conversation::class)
             ->findConvByUser($user);
 
-        $paginatedCollection = $this->getPaginator()->paginate($conversations, $page, 4);
-        $serialization = $this->getSerializer()->serialize('conversation', true);
+        $paginatedCollection = $this->paginator->paginate($conversations, $page, 4);
+        $serialization = $this->serializer->serialize('conversation', true);
 
         $data =  $this->get('serializer')->serialize($paginatedCollection, 'json', $serialization);
 

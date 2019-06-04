@@ -25,7 +25,7 @@ class ApiTrajetController extends ApiController
      */
     public function afficherTrajet(Trajet $trajet)
     {
-        $data =  $this->get('serializer')->serialize($trajet, 'json', $this->getSerializer()->serialize('trajet'));
+        $data =  $this->get('serializer')->serialize($trajet, 'json', $this->serializer->serialize('trajet'));
 
         return new Response($data);
     }
@@ -41,8 +41,8 @@ class ApiTrajetController extends ApiController
             ->getRepository(Trajet::class)
             ->findBy(['createur' => $user]);
 
-        $paginatedCollection = $this->getPaginator()->paginate($trajets, $page, 10);
-        $serialization = $this->getSerializer()->serialize('trajet', true);
+        $paginatedCollection = $this->paginator->paginate($trajets, $page, 10);
+        $serialization = $this->serializer->serialize('trajet', true);
 
         $data = $this->get('serializer')->serialize($paginatedCollection, 'json', $serialization);
 
@@ -60,8 +60,8 @@ class ApiTrajetController extends ApiController
             ->getRepository(Trajet::class)
             ->findBy(['lieuDepart' => $depart, 'lieuArrive' => $arrive]);
 
-        $paginatedCollection = $this->getPaginator()->paginate($trajets, $page, 10);
-        $serialization = $this->getSerializer()->serialize('trajet', true);
+        $paginatedCollection = $this->paginator->paginate($trajets, $page, 10);
+        $serialization = $this->serializer->serialize('trajet', true);
 
         $data = $this->get('serializer')->serialize($paginatedCollection, 'json', $serialization);
 
@@ -78,8 +78,8 @@ class ApiTrajetController extends ApiController
             ->getRepository(Trajet::class)
             ->findAll();
 
-        $paginatedCollection = $this->getPaginator()->paginate($trajets, $page, 10);
-        $serialization = $this->getSerializer()->serialize('trajet', true);
+        $paginatedCollection = $this->paginator->paginate($trajets, $page, 10);
+        $serialization = $this->serializer->serialize('trajet', true);
 
         $data = $this->get('serializer')->serialize($paginatedCollection, 'json', $serialization);
 
