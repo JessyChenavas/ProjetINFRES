@@ -7,7 +7,6 @@ use App\Entity\User;
 use App\Entity\Voiture;
 use App\Entity\Message;
 use FOS\UserBundle\Model\UserManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -20,43 +19,38 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 /**
  * @Route("/api", name="api_")
  */
-class ApiUserController extends AbstractController
+class ApiUserController extends ApiController
 {
     /**
-     * @Rest\Get("/users/{id}", name="afficher_utlisateur")
+     * @Rest\Get("/users/{id}", name="afficher_utlisateur", requirements={"id" = "\d+"})
      *
      * @return Response
      */
     public function afficherUtilisateur(User $user)
     {
-        $data =  $this->get('serializer')->serialize($user, 'json',
-            ['attributes' => ['id', 'username', 'email', 'roles', 'nom', 'prenom', 'genre', 'dateNaissance', 'promotion',
-                'voiture' => ['modele', 'marque', 'couleur']]]);
+        $data =  $this->get('serializer')->serialize($user, 'json', $this->getSerializer()->serialize('user'));
 
-        $response = new Response($data);
-
-        return $response;
+        return new Response($data);
     }
 
     /**
-     * @Rest\Get("/users", name="liste_utlisateurs")
+     * @Rest\Get("/users", defaults={"page" = 1}, name="liste_utlisateurs")
+     * @Rest\Get("/users/page{page}", name="liste_utlisateurs_pagine")
      *
      * @return Response
      */
-    public function listeUtilisateurs()
+    public function listeUtilisateurs($page)
     {
         $users = $this->getDoctrine()
             ->getRepository(User::class)
             ->findAll();
 
-        $data =  $this->get('serializer')->serialize($users, 'json',
-            ['attributes' => ['id', 'username', 'email', 'roles', 'nom', 'prenom', 'genre', 'dateNaissance', 'promotion',
-                'voiture' => ['modele', 'marque', 'couleur']]]);
+        $paginatedCollection = $this->getPaginator()->paginate($users, $page, 5);
+        $serialization = $this->getSerializer()->serialize('user', true);
 
-        $response = new Response($data);
-        $response->headers->set('Content-Type', 'application/json');
+        $data = $this->get('serializer')->serialize($paginatedCollection, 'json', $serialization);
 
-        return $response;
+        return new Response($data);
     }
 
     /**
@@ -154,7 +148,7 @@ class ApiUserController extends AbstractController
     }
 
     /**
-     *  @Rest\Get("/users/{user_id}/conversations/{conversation_id}", name="afficher_conversation")
+     *  @Rest\Get("/users/{user_id}/conversations/{conversation_id}", name="afficher_conversation", requirements={"user_id" = "\d+", "conversation_id"= "\d+"})
      *
      *  @ParamConverter("conversation", options={"mapping": {"conversation_id": "id"}})
      *  @ParamConverter("user", options={"mapping": {"user_id": "id"}})
@@ -165,34 +159,30 @@ class ApiUserController extends AbstractController
      *  @Security("conversation.estMembre(user) or is_granted('ROLE_ADMIN')", statusCode=403, message="Seuls les membres de la conversation peuvent effectuer cette action !"))
      */
     public function afficherConversation(Conversation $conversation) {
-        $data =  $this->get('serializer')->serialize($conversation, 'json',
-            ['attributes' => ['id', 'messages' => ['texte', 'date', 'auteur' => ['username']], 'participants' => ['id', 'username', 'email', 'roles', 'nom', 'prenom', 'genre', 'dateNaissance', 'promotion',
-                'voiture' => ['modele', 'marque', 'couleur']]]]);
+        $data =  $this->get('serializer')->serialize($conversation, 'json', $this->getSerializer()->serialize('conversation'));
 
-        $response = new Response($data);
-
-        return $response;
+        return new Response($data);
     }
 
     /**
-     *  @Rest\Get("/users/{id}/conversations", name="liste_conversations")
+     * @Rest\Get("/users/{id}/conversations", defaults={"page" = 1}, name="liste_conversations")
+     * @Rest\Get("/users/{id}/conversations/page{page}", name="liste_conversations_pagine")
      *
      *  @return Response
      *
      *  @Security("is_granted('IS_AUTHENTICATED_FULLY')", statusCode=401, message="Vous devez être connecté pour effectuer cette action !"))
      *  @Security("user.getId() == id or is_granted('ROLE_ADMIN')", statusCode=403, message="Seul l'utilisateur concerné peut effectuer cette action !"))
      */
-    public function listeConversationsParUtilisateur(User $user) {
+    public function listeConversationsParUtilisateur(User $user, $page) {
         $conversations = $this->getDoctrine()
             ->getRepository(Conversation::class)
             ->findConvByUser($user);
 
-        $data =  $this->get('serializer')->serialize($conversations, 'json',
-            ['attributes' => ['id', 'messages' => ['texte', 'date', 'auteur' => ['username']], 'participants' => ['id', 'username', 'email', 'roles', 'nom', 'prenom', 'genre', 'dateNaissance', 'promotion',
-                'voiture' => ['modele', 'marque', 'couleur']]]]);
+        $paginatedCollection = $this->getPaginator()->paginate($conversations, $page, 4);
+        $serialization = $this->getSerializer()->serialize('conversation', true);
 
-        $response = new Response($data);
+        $data =  $this->get('serializer')->serialize($paginatedCollection, 'json', $serialization);
 
-        return $response;
+        return new Response($data);
     }
 }

@@ -5,7 +5,6 @@ namespace App\Controller\Api;
 use App\Entity\Evenement;
 use App\Entity\Image;
 use App\Form\EvenementType;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
@@ -17,37 +16,38 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 /**
  * @Route("/api", name="api_")
  */
-class ApiEvenementController extends AbstractController
+class ApiEvenementController extends ApiController
 {
     /**
-     * @Rest\Get("/events", name="liste_evenements")
+     * @Rest\Get("/events", defaults={"page" = 1}, name="liste_evenements")
+     * @Rest\Get("/events/page{page}", name="liste_evenements_pagine")
      *
      * @return Response
      */
-    public function listeEvenements()
+    public function listeEvenements($page)
     {
-        $repository = $this->getDoctrine()->getRepository(Evenement::class);
-        $events = $repository->findall();
+        $events = $this->getDoctrine()
+            ->getRepository(Evenement::class)
+            ->findAll();
 
-        $data =  $this->get('serializer')->serialize($events, 'json', ['attributes' =>
-            [ 'id', 'titre', 'description', 'lieu', 'date', 'image', 'auteur' => ['id','username','email']]]);
+        $paginatedCollection = $this->getPaginator()->paginate($events, $page, 5);
+        $serialization = $this->getSerializer()->serialize('evenement', true);
 
-        $response = new Response($data);
-        return $response;
+        $data =  $this->get('serializer')->serialize($paginatedCollection, 'json', $serialization);
+
+        return new Response($data);
     }
 
     /**
-     * @Rest\Get("/events/{id}", name="afficher_evenement")
+     * @Rest\Get("/events/{id}", name="afficher_evenement", requirements={"id" = "\d+"})
      *
      * @return Response
      */
     public function afficherEvenement(Evenement $event)
     {
-        $data =  $this->get('serializer')->serialize($event, 'json', ['attributes' =>
-            [ 'id', 'titre', 'description', 'lieu', 'date', 'image', 'auteur' => ['id','username','email']]]);
+        $data =  $this->get('serializer')->serialize($event, 'json', $this->getSerializer()->serialize('evenement'));
 
-        $response = new Response($data);
-        return $response;
+        return new Response($data);
     }
 
     /**

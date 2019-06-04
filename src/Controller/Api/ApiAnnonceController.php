@@ -4,53 +4,49 @@ namespace App\Controller\Api;
 
 use App\Entity\Annonce;
 use App\Entity\Image;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use Symfony\Component\Routing\Annotation\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 
 /**
  * @Route("/api", name="api_")
  */
-class ApiAnnonceController extends AbstractController
+class ApiAnnonceController extends ApiController
 {
     /**
-     * @Rest\Get("/annonces/{id}", name="afficher_annonce")
+     * @Rest\Get("/annonces/{id}", name="afficher_annonce", requirements={"id" = "\d+"})
      *
      * @return Response
      */
     public function afficherAnnonce(Annonce $annonce)
     {
-        $data =  $this->get('serializer')->serialize($annonce, 'json', ['attributes' =>
-            [ 'id', 'titre', 'description', 'prix', 'createur', 'images']]);
+        $data =  $this->get('serializer')->serialize($annonce, 'json', $this->getSerializer()->serialize('annonce'));
 
-        $response = new Response($data);
-
-        return $response;
+        return new Response($data);
     }
 
     /**
-     * @Rest\Get("/annonces", name="liste_annonces")
+     * @Rest\Get("/annonces", defaults={"page" = 1}, name="liste_annonces")
+     * @Rest\Get("/annonces/page{page}", name="liste_annonces_pagine")
      *
      * @return Response
      */
-    public function listeAnnonces()
+    public function listeAnnonces($page)
     {
         $annonces = $this->getDoctrine()
             ->getRepository(Annonce::class)
             ->findAll();
 
-        $data =  $this->get('serializer')->serialize($annonces, 'json', ['attributes' =>
-            [ 'id', 'titre', 'description', 'prix', 'createur', 'images']]);
+        $paginatedCollection = $this->getPaginator()->paginate($annonces, $page, 10);
+        $serialization = $this->getSerializer()->serialize('annonce', true);
 
-        $response = new Response($data);
+        $data =  $this->get('serializer')->serialize($paginatedCollection, 'json', $serialization);
 
-        return $response;
+        return new Response($data);
     }
 
     /**

@@ -4,7 +4,6 @@ namespace App\Controller\Api;
 
 use App\Entity\Trajet;
 use App\Entity\User;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -17,80 +16,74 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 /**
  * @Route("/api", name="api_")
  */
-class ApiTrajetController extends AbstractController
+class ApiTrajetController extends ApiController
 {
     /**
-     * @Rest\Get("/trajets/{id}", name="afficher_trajet")
+     * @Rest\Get("/trajets/{id}", name="afficher_trajet", requirements={"id" = "\d+"})
      *
      * @return Response
      */
     public function afficherTrajet(Trajet $trajet)
     {
-        $data =  $this->get('serializer')->serialize($trajet, 'json', ['attributes' =>
-            [ 'id', 'lieuDepart', 'lieuArrive', 'heureDepart', 'passagersMax', 'tarif', 'createur' => ['id', 'username', 'email', 'nom', 'prenom', 'genre', 'dateNaissance', 'promotion',
-                'voiture' => ['modele', 'marque', 'couleur']],  'passagers' => ['id','username','email']]]);
+        $data =  $this->get('serializer')->serialize($trajet, 'json', $this->getSerializer()->serialize('trajet'));
 
-        $response = new Response($data);
-
-        return $response;
+        return new Response($data);
     }
 
     /**
-     * @Rest\Get("/trajets/users/{id}", name="afficher_trajets_utilisateur")
+     * @Rest\Get("/trajets/users/{id}", defaults={"page" = 1}, name="afficher_trajets_utilisateur")
+     * @Rest\Get("/trajets/users/{id}/page{page}", name="afficher_trajets_utilisateur_pagine")
      *
      * @return Response
      */
-    public function afficherTrajetParUtilisateur(User $user) {
+    public function afficherTrajetParUtilisateur(User $user, $page) {
         $trajets = $this->getDoctrine()
             ->getRepository(Trajet::class)
             ->findBy(['createur' => $user]);
 
-        $data =  $this->get('serializer')->serialize($trajets, 'json', ['attributes' =>
-            [ 'id', 'lieuDepart', 'lieuArrive', 'heureDepart', 'passagersMax', 'tarif', 'createur' => ['id', 'username', 'email', 'nom', 'prenom', 'genre', 'dateNaissance', 'promotion',
-                'voiture' => ['modele', 'marque', 'couleur']],  'passagers' => ['id','username','email']]]);
+        $paginatedCollection = $this->getPaginator()->paginate($trajets, $page, 10);
+        $serialization = $this->getSerializer()->serialize('trajet', true);
 
-        $response = new Response($data);
+        $data = $this->get('serializer')->serialize($paginatedCollection, 'json', $serialization);
 
-        return $response;
+        return new Response($data);
     }
 
     /**
-     * @Rest\Get("/trajets/depart/{depart}/arrive/{arrive}", name="afficher_trajets_lieu_depart_arrive")
+     * @Rest\Get("/trajets/depart/{depart}/arrive/{arrive}", defaults={"page" = 1}, name="afficher_trajets_lieu_depart_arrive")
+     * @Rest\Get("/trajets/depart/{depart}/arrive/{arrive}/page{page}", name="afficher_trajets_lieu_depart_arrive_pagine")
      *
      * @return Response
      */
-    public function afficherTrajetParLieuDepartArrive(string $depart, string $arrive) {
+    public function afficherTrajetParLieuDepartArrive(string $depart, string $arrive, $page) {
         $trajets = $this->getDoctrine()
             ->getRepository(Trajet::class)
             ->findBy(['lieuDepart' => $depart, 'lieuArrive' => $arrive]);
 
-        $data =  $this->get('serializer')->serialize($trajets, 'json', ['attributes' =>
-            [ 'id', 'lieuDepart', 'lieuArrive', 'heureDepart', 'passagersMax', 'tarif', 'createur' => ['id', 'username', 'email', 'nom', 'prenom', 'genre', 'dateNaissance', 'promotion',
-                'voiture' => ['modele', 'marque', 'couleur']],  'passagers' => ['id','username','email']]]);
+        $paginatedCollection = $this->getPaginator()->paginate($trajets, $page, 10);
+        $serialization = $this->getSerializer()->serialize('trajet', true);
 
-        $response = new Response($data);
+        $data = $this->get('serializer')->serialize($paginatedCollection, 'json', $serialization);
 
-        return $response;
+        return new Response($data);
     }
 
     /**
-     * @Rest\Get("/trajets", name="liste_trajets")
-     *
-     * @return Response
+     * @Rest\Get("/trajets", defaults={"page" = 1}, name="liste_trajets")
+     * @Rest\Get("/trajets/page{page}", name="liste_trajets_pagine")
      */
-    public function listeTrajets()
+    public function listeTrajets($page)
     {
         $trajets = $this->getDoctrine()
             ->getRepository(Trajet::class)
             ->findAll();
 
-        $data =  $this->get('serializer')->serialize($trajets, 'json', ['attributes' =>
-            [ 'id', 'lieuDepart', 'lieuArrive', 'heureDepart', 'passagersMax', 'tarif', 'createur' => ['id', 'username', 'email', 'nom', 'prenom', 'genre', 'dateNaissance', 'promotion',
-                'voiture' => ['modele', 'marque', 'couleur']],  'passagers' => ['id','username','email']]]);
+        $paginatedCollection = $this->getPaginator()->paginate($trajets, $page, 10);
+        $serialization = $this->getSerializer()->serialize('trajet', true);
 
-        $response = new Response($data);
+        $data = $this->get('serializer')->serialize($paginatedCollection, 'json', $serialization);
 
-        return $response;
+        return new Response($data);
     }
 
     /**
