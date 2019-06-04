@@ -4,6 +4,7 @@ namespace App\Controller\Api;
 
 use App\Entity\Evenement;
 use App\Entity\Image;
+use App\Exception\ResourceValidationException;
 use App\Form\EvenementType;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -23,12 +24,17 @@ class ApiEvenementController extends ApiController
      * @Rest\Get("/events/page{page}", name="liste_evenements_pagine")
      *
      * @return Response
+     * @throws ResourceValidationException
      */
     public function listeEvenements($page)
     {
         $events = $this->getDoctrine()
             ->getRepository(Evenement::class)
             ->findAll();
+
+        if (!$events) {
+            throw new ResourceValidationException('Aucun évènement trouvé !');
+        }
 
         $paginatedCollection = $this->paginator->paginate($events, $page, 5);
         $serialization = $this->serializer->serialize('evenement', true);
@@ -42,9 +48,14 @@ class ApiEvenementController extends ApiController
      * @Rest\Get("/events/{id}", name="afficher_evenement", requirements={"id" = "\d+"})
      *
      * @return Response
+     * @throws ResourceValidationException
      */
-    public function afficherEvenement(Evenement $event)
+    public function afficherEvenement(Evenement $event = null)
     {
+        if (!$event) {
+            throw new ResourceValidationException('Évènement non existant !');
+        }
+
         $data =  $this->get('serializer')->serialize($event, 'json', $this->serializer->serialize('evenement'));
 
         return new Response($data);

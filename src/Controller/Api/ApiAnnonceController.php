@@ -4,6 +4,7 @@ namespace App\Controller\Api;
 
 use App\Entity\Annonce;
 use App\Entity\Image;
+use App\Exception\ResourceValidationException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -21,10 +22,15 @@ class ApiAnnonceController extends ApiController
      * @Rest\Get("/annonces/{id}", name="afficher_annonce", requirements={"id" = "\d+"})
      *
      * @return Response
+     * @throws ResourceValidationException
      */
     public function afficherAnnonce(Annonce $annonce)
     {
         $data =  $this->get('serializer')->serialize($annonce, 'json', $this->serializer->serialize('annonce'));
+
+        if (!$data) {
+            throw new ResourceValidationException('Annonce non existante !');
+        }
 
         return new Response($data);
     }
@@ -34,12 +40,17 @@ class ApiAnnonceController extends ApiController
      * @Rest\Get("/annonces/page{page}", name="liste_annonces_pagine")
      *
      * @return Response
+     * @throws ResourceValidationException
      */
     public function listeAnnonces($page)
     {
         $annonces = $this->getDoctrine()
             ->getRepository(Annonce::class)
             ->findAll();
+
+        if (!$annonces) {
+            throw new ResourceValidationException('Aucune annonce trouvée !');
+        }
 
         $paginatedCollection = $this->paginator->paginate($annonces, $page, 10);
         $serialization = $this->serializer->serialize('annonce', true);

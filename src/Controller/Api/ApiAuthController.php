@@ -34,11 +34,21 @@ class ApiAuthController extends AbstractController
         }
 
        if (isset($data['voiture'])) {
-           $voiture = new Voiture();
+           $em = $this->getDoctrine()->getManager();
 
-           $voiture->setCouleur($data['voiture']['couleur']);
-           $voiture->setMarque($data['voiture']['marque']);
-           $voiture->setModele($data['voiture']['modele']);
+           $voiture = $this->getDoctrine()
+               ->getRepository(Voiture::class)
+               ->findOneBy(['couleur' => $data['voiture']['couleur'], 'marque' => $data['voiture']['marque'], 'modele' => $data['voiture']['modele']]);
+
+           if (!$voiture) {
+               $voiture = new Voiture();
+               $voiture->setCouleur($data['voiture']['couleur']);
+               $voiture->setMarque($data['voiture']['marque']);
+               $voiture->setModele($data['voiture']['modele']);
+
+               $em->persist($voiture);
+               $em->flush();
+           }
 
            $user->setVoiture($voiture);
         }
@@ -63,9 +73,10 @@ class ApiAuthController extends AbstractController
         try {
             $userManager->updateUser($user, true);
         } catch (\Exception $e) {
-            return new JsonResponse(["error" => "ERROR : ".$e->getMessage()], 500);
+          # return new JsonResponse(["error" => "ERROR : ".$e->getMessage()], 500);
+            return new JsonResponse(["error" => "L'email/username est déjà utilisé !"], 500);
         }
 
-        return new JsonResponse(["success" => $user->getUsername(). " has been registered!"], 201);
+        return new JsonResponse(["success" => sprintf("%s a bien été inscrit ! ", $user->getUsername())], 201);
     }
 }

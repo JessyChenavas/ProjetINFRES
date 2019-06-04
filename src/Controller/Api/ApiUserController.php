@@ -6,6 +6,7 @@ use App\Entity\Conversation;
 use App\Entity\User;
 use App\Entity\Voiture;
 use App\Entity\Message;
+use App\Exception\ResourceValidationException;
 use FOS\UserBundle\Model\UserManagerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -25,10 +26,15 @@ class ApiUserController extends ApiController
      * @Rest\Get("/users/{id}", name="afficher_utlisateur", requirements={"id" = "\d+"})
      *
      * @return Response
+     * @throws ResourceValidationException
      */
     public function afficherUtilisateur(User $user)
     {
         $data =  $this->get('serializer')->serialize($user, 'json', $this->serializer->serialize('user'));
+
+        if (!$data) {
+            throw new ResourceValidationException('Utilisateur non existant !');
+        }
 
         return new Response($data);
     }
@@ -38,12 +44,17 @@ class ApiUserController extends ApiController
      * @Rest\Get("/users/page{page}", name="liste_utlisateurs_pagine")
      *
      * @return Response
+     * @throws ResourceValidationException
      */
     public function listeUtilisateurs($page)
     {
         $users = $this->getDoctrine()
             ->getRepository(User::class)
             ->findAll();
+
+        if (!$users) {
+            throw new ResourceValidationException('Aucun utilisateur trouvé !');
+        }
 
         $paginatedCollection = $this->paginator->paginate($users, $page, 5);
         $serialization = $this->serializer->serialize('user', true);

@@ -4,6 +4,7 @@ namespace App\Controller\Api;
 
 use App\Entity\Trajet;
 use App\Entity\User;
+use App\Exception\ResourceValidationException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -22,10 +23,15 @@ class ApiTrajetController extends ApiController
      * @Rest\Get("/trajets/{id}", name="afficher_trajet", requirements={"id" = "\d+"})
      *
      * @return Response
+     * @throws ResourceValidationException
      */
     public function afficherTrajet(Trajet $trajet)
     {
         $data =  $this->get('serializer')->serialize($trajet, 'json', $this->serializer->serialize('trajet'));
+
+        if (!$data) {
+            throw new ResourceValidationException('Trajet non existant !');
+        }
 
         return new Response($data);
     }
@@ -35,11 +41,16 @@ class ApiTrajetController extends ApiController
      * @Rest\Get("/trajets/users/{id}/page{page}", name="afficher_trajets_utilisateur_pagine")
      *
      * @return Response
+     * @throws ResourceValidationException
      */
     public function afficherTrajetParUtilisateur(User $user, $page) {
         $trajets = $this->getDoctrine()
             ->getRepository(Trajet::class)
             ->findBy(['createur' => $user]);
+
+        if (!$trajets) {
+            throw new ResourceValidationException('Aucun trajet trouvé !');
+        }
 
         $paginatedCollection = $this->paginator->paginate($trajets, $page, 10);
         $serialization = $this->serializer->serialize('trajet', true);
@@ -54,11 +65,16 @@ class ApiTrajetController extends ApiController
      * @Rest\Get("/trajets/depart/{depart}/arrive/{arrive}/page{page}", name="afficher_trajets_lieu_depart_arrive_pagine")
      *
      * @return Response
+     * @throws ResourceValidationException
      */
     public function afficherTrajetParLieuDepartArrive(string $depart, string $arrive, $page) {
         $trajets = $this->getDoctrine()
             ->getRepository(Trajet::class)
             ->findBy(['lieuDepart' => $depart, 'lieuArrive' => $arrive]);
+
+        if (!$trajets) {
+            throw new ResourceValidationException('Aucun trajet trouvé !');
+        }
 
         $paginatedCollection = $this->paginator->paginate($trajets, $page, 10);
         $serialization = $this->serializer->serialize('trajet', true);
@@ -71,12 +87,17 @@ class ApiTrajetController extends ApiController
     /**
      * @Rest\Get("/trajets", defaults={"page" = 1}, name="liste_trajets")
      * @Rest\Get("/trajets/page{page}", name="liste_trajets_pagine")
+     * @throws ResourceValidationException
      */
     public function listeTrajets($page)
     {
         $trajets = $this->getDoctrine()
             ->getRepository(Trajet::class)
             ->findAll();
+
+        if (!$trajets) {
+            throw new ResourceValidationException('Aucun trajet trouvé !');
+        }
 
         $paginatedCollection = $this->paginator->paginate($trajets, $page, 10);
         $serialization = $this->serializer->serialize('trajet', true);
