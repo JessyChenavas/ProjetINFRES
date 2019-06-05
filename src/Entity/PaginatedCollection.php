@@ -18,8 +18,15 @@ class PaginatedCollection
             ->addMeta('current_items', count($data->getCurrentPageResults()))
             ->addMeta('total_items', $data->getNbResults())
             ->addMeta('offset', $data->getCurrentPageOffsetStart())
-            ->addMeta('has_next_page', $data->hasNextPage())
-            ->addMeta('has_previous_page', $data->hasPreviousPage());
+            ->addMeta('last_page', $data->getNbPages());
+
+        if ($data->hasNextPage()) {
+            $this->addMeta('next_page', $data->getNextPage());
+        }
+
+        if ($data->hasPreviousPage()) {
+            $this->addMeta('previous_page', $data->getPreviousPage());
+        }
     }
 
     public function addMeta($name, $value)
