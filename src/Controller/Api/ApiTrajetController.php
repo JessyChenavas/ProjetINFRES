@@ -25,13 +25,13 @@ class ApiTrajetController extends ApiController
      * @return Response
      * @throws ResourceValidationException
      */
-    public function afficherTrajet(Trajet $trajet)
+    public function afficherTrajet(Trajet $trajet = null)
     {
-        $data =  $this->get('serializer')->serialize($trajet, 'json', $this->serializer->serialize('trajet'));
-
-        if (!$data) {
+        if (!$trajet) {
             throw new ResourceValidationException('Trajet non existant !');
         }
+
+        $data =  $this->get('serializer')->serialize($trajet, 'json', $this->serializer->serialize('trajet'));
 
         return new Response($data);
     }
@@ -43,7 +43,11 @@ class ApiTrajetController extends ApiController
      * @return Response
      * @throws ResourceValidationException
      */
-    public function afficherTrajetParUtilisateur(User $user, $page) {
+    public function afficherTrajetParUtilisateur($page, User $user = null) {
+        if (!$user) {
+            throw new ResourceValidationException('Utilisateur non existant !');
+        }
+
         $trajets = $this->getDoctrine()
             ->getRepository(Trajet::class)
             ->findBy(['createur' => $user]);
@@ -120,6 +124,10 @@ class ApiTrajetController extends ApiController
 
         $data = json_decode($request->getContent(), true);
 
+        if (!isset($data['tarif'])) {
+            $data['tarif'] = 0;
+        }
+
         $trajet->setLieuDepart($data['lieu_depart'])
             ->setLieuArrive($data['lieu_arrive'])
             ->setHeureDepart(new \DateTime($data["heure_depart"]))
@@ -140,15 +148,20 @@ class ApiTrajetController extends ApiController
     }
 
     /**
-     *  @Rest\Put("/trajets/{id}", name="modifier_trajet")
+     * @Rest\Put("/trajets/{id}", name="modifier_trajet")
      *
-     *  @return JsonResponse
+     * @return JsonResponse
      *
-     *  @Security("is_granted('IS_AUTHENTICATED_FULLY')", statusCode=401, message="Vous devez être connecté pour effectuer cette action !"))
-     *  @Security("trajet.estCreateur(user) or is_granted('ROLE_ADMIN')", statusCode=403, message="Seul le créateur du trajet peut effectuer cette action !")
+     * @Security("is_granted('IS_AUTHENTICATED_FULLY')", statusCode=401, message="Vous devez être connecté pour effectuer cette action !"))
+     * @Security("trajet.estCreateur(user) or is_granted('ROLE_ADMIN')", statusCode=403, message="Seul le créateur du trajet peut effectuer cette action !")
+     * @throws ResourceValidationException
      */
-    public function modifierTrajet(Request $request, Trajet $trajet, ValidatorInterface $validator)
+    public function modifierTrajet(Request $request, ValidatorInterface $validator, Trajet $trajet = null)
     {
+        if (!$trajet) {
+            throw new ResourceValidationException('Trajet non existant !');
+        }
+
         $data = json_decode($request->getContent(), true);
 
         $trajet->setLieuDepart($data['lieu_depart'])
@@ -170,14 +183,19 @@ class ApiTrajetController extends ApiController
     }
 
     /**
-     *  @Rest\Delete("/trajets/{id}", name="supprimer_trajet")
+     * @Rest\Delete("/trajets/{id}", name="supprimer_trajet")
      *
-     *  @return JsonResponse
+     * @return JsonResponse
      *
-     *  @Security("is_granted('IS_AUTHENTICATED_FULLY')", statusCode=401, message="Vous devez être connecté pour effectuer cette action !"))
-     *  @Security("trajet.estCreateur(user) or is_granted('ROLE_ADMIN')", statusCode=403, message="Seul le créateur du trajet peut effectuer cette action !")
+     * @Security("is_granted('IS_AUTHENTICATED_FULLY')", statusCode=401, message="Vous devez être connecté pour effectuer cette action !"))
+     * @Security("trajet.estCreateur(user) or is_granted('ROLE_ADMIN')", statusCode=403, message="Seul le créateur du trajet peut effectuer cette action !")
+     * @throws ResourceValidationException
      */
-    public function supprimerTrajet(Trajet $trajet) {
+    public function supprimerTrajet(Trajet $trajet = null) {
+        if (!$trajet) {
+            throw new ResourceValidationException('Trajet non existant !');
+        }
+
         $em = $this->getDoctrine()->getManager();
         $em->remove($trajet);
         $em->flush();
@@ -186,17 +204,26 @@ class ApiTrajetController extends ApiController
     }
 
     /**
-     *  @Rest\Post("/trajets/{trajet_id}/passagers/{passager_id}", name="ajouter_passager")
+     * @Rest\Post("/trajets/{trajet_id}/passagers/{passager_id}", name="ajouter_passager")
      *
-     *  @ParamConverter("trajet", options={"mapping": {"trajet_id": "id"}})
-     *  @ParamConverter("user", options={"mapping": {"passager_id": "id"}})
+     * @ParamConverter("trajet", options={"mapping": {"trajet_id": "id"}})
+     * @ParamConverter("user", options={"mapping": {"passager_id": "id"}})
      *
-     *  @return JsonResponse
+     * @return JsonResponse
      *
-     *  @Security("is_granted('IS_AUTHENTICATED_FULLY')", statusCode=401, message="Vous devez être connecté pour effectuer cette action !"))
-     *  @Security("trajet.estCreateur(user) or is_granted('ROLE_ADMIN')", statusCode=403, message="Seul le créateur du trajet peut effectuer cette action !")
+     * @Security("is_granted('IS_AUTHENTICATED_FULLY')", statusCode=401, message="Vous devez être connecté pour effectuer cette action !"))
+     * @Security("trajet.estCreateur(user) or is_granted('ROLE_ADMIN')", statusCode=403, message="Seul le créateur du trajet peut effectuer cette action !")
+     * @throws ResourceValidationException
      */
-    public function ajouterPassager(Trajet $trajet, User $user) {
+    public function ajouterPassager(Trajet $trajet = null, User $user = null) {
+        if (!$trajet) {
+            throw new ResourceValidationException('Trajet non existant !');
+        }
+
+        if (!$user) {
+            throw new ResourceValidationException('Utilisateur non existant !');
+        }
+
         if($trajet->getCreateur()->getId() == $user->getId()) {
             return new JsonResponse(
                 ["error" => "L'ajout n'a pas été effectué : le créateur ne peut pas être passagé."],
@@ -221,17 +248,26 @@ class ApiTrajetController extends ApiController
     }
 
     /**
-     *  @Rest\Delete("/trajets/{trajet_id}/passagers/{passager_id}", name="supprimer_passager")
+     * @Rest\Delete("/trajets/{trajet_id}/passagers/{passager_id}", name="supprimer_passager")
      *
-     *  @ParamConverter("trajet", options={"mapping": {"trajet_id": "id"}})
-     *  @ParamConverter("user", options={"mapping": {"passager_id": "id"}})
+     * @ParamConverter("trajet", options={"mapping": {"trajet_id": "id"}})
+     * @ParamConverter("user", options={"mapping": {"passager_id": "id"}})
      *
-     *  @return JsonResponse
+     * @return JsonResponse
      *
-     *  @Security("is_granted('IS_AUTHENTICATED_FULLY')", statusCode=401, message="Vous devez être connecté pour effectuer cette action !"))
-     *  @Security("trajet.estCreateur(user) or is_granted('ROLE_ADMIN')", statusCode=403, message="Seul le créateur du trajet peut effectuer cette action !")
+     * @Security("is_granted('IS_AUTHENTICATED_FULLY')", statusCode=401, message="Vous devez être connecté pour effectuer cette action !"))
+     * @Security("trajet.estCreateur(user) or is_granted('ROLE_ADMIN')", statusCode=403, message="Seul le créateur du trajet peut effectuer cette action !")
+     * @throws ResourceValidationException
      */
-    public function supprimerPassager(Trajet $trajet, User $user) {
+    public function supprimerPassager(Trajet $trajet = null, User $user = null) {
+        if (!$trajet) {
+            throw new ResourceValidationException('Trajet non existant !');
+        }
+
+        if (!$user) {
+            throw new ResourceValidationException('Utilisateur non existant !');
+        }
+
         if ($trajet->removePassager($user)) {
             $json_response = new JsonResponse(
                 ["success" => sprintf("Le passager %s a été supprimé du trajet de %s ! ", $user->getUsername(), $trajet->getCreateur()->getUsername())],

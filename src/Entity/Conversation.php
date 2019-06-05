@@ -27,6 +27,7 @@ class Conversation
 
     /**
      * @ORM\OneToMany(targetEntity="Message", mappedBy="conversation")
+     * @Assert\Valid()
      */
     private $messages;
 

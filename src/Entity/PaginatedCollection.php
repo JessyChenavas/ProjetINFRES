@@ -14,12 +14,12 @@ class PaginatedCollection
     {
         $this->data = $data;
 
-        $this->addMeta('limit', $data->getMaxPerPage());
-        $this->addMeta('current_items', count($data->getCurrentPageResults()));
-        $this->addMeta('total_items', $data->getNbResults());
-        $this->addMeta('offset', $data->getCurrentPageOffsetStart());
-        $this->addMeta('has_next_page', $data->hasNextPage());
-        $this->addMeta('has_previous_page', $data->hasPreviousPage());
+        $this->addMeta('limit', $data->getMaxPerPage())
+            ->addMeta('current_items', count($data->getCurrentPageResults()))
+            ->addMeta('total_items', $data->getNbResults())
+            ->addMeta('offset', $data->getCurrentPageOffsetStart())
+            ->addMeta('has_next_page', $data->hasNextPage())
+            ->addMeta('has_previous_page', $data->hasPreviousPage());
     }
 
     public function addMeta($name, $value)
@@ -29,6 +29,8 @@ class PaginatedCollection
         }
 
         $this->setMeta($name, $value);
+
+        return $this;
     }
 
     public function setMeta($name, $value)

@@ -38,7 +38,7 @@ class Message
 
     /**
      * @ORM\Column(type="text")
-     * @Assert\NotBlank()
+     * @Assert\NotBlank(message="Merci d'écrire un message non vide !")
      */
     private $texte;
 

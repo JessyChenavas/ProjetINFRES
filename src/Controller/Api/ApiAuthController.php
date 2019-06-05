@@ -10,8 +10,6 @@ use App\Entity\User;
 use App\Entity\Voiture;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Symfony\Component\Validator\Validation;
-use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
@@ -26,15 +24,11 @@ class ApiAuthController extends AbstractController
     public function register(Request $request, UserManagerInterface $userManager, ValidatorInterface $validator)
     {
         $data = json_decode($request->getContent(), true);
+        $em = $this->getDoctrine()->getManager();
 
         $user = new User();
 
-        if (preg_match("/(CMC|MKX|FI|INFRES)/", $data['promotion'])) {
-            $user->setPromotion($data['promotion']);
-        }
-
        if (isset($data['voiture'])) {
-           $em = $this->getDoctrine()->getManager();
 
            $voiture = $this->getDoctrine()
                ->getRepository(Voiture::class)
@@ -47,7 +41,6 @@ class ApiAuthController extends AbstractController
                $voiture->setModele($data['voiture']['modele']);
 
                $em->persist($voiture);
-               $em->flush();
            }
 
            $user->setVoiture($voiture);
@@ -63,7 +56,8 @@ class ApiAuthController extends AbstractController
             ->setGenre($data['genre'])
             ->setPrenom($data['prenom'])
             ->setNom($data['nom'])
-            ->setDateNaissance(new \DateTime($data['dateNaissance']));
+            ->setDateNaissance(new \DateTime($data['dateNaissance']))
+            ->setPromotion($data['promotion']);
 
         $listErrors = $validator->validate($user);
         if(count($listErrors) > 0) {
@@ -71,6 +65,7 @@ class ApiAuthController extends AbstractController
         }
 
         try {
+            $em->flush();
             $userManager->updateUser($user, true);
         } catch (\Exception $e) {
           # return new JsonResponse(["error" => "ERROR : ".$e->getMessage()], 500);

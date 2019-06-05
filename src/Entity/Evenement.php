@@ -19,13 +19,13 @@ class Evenement {
 
     /**
      * @ORM\Column(type="string", length=100)
-     * @Assert\NotBlank()
+     * @Assert\NotBlank(message="Merci de renseigner un titre !")
      */
     private $titre;
 
     /**
      * @ORM\Column(type="text")
-     * @Assert\NotBlank()
+     * @Assert\NotBlank(message="Merci de renseigner une description !")
      */
     private $description;
     /**
@@ -34,7 +34,7 @@ class Evenement {
 
     /**
      * @ORM\Column(type="string", length=100)
-     * @Assert\NotBlank()
+     * @Assert\NotBlank(message="Merci de renseigner un lieu !")
      */
     private $lieu;
 

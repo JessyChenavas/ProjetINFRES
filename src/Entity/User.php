@@ -48,6 +48,10 @@ class User extends BaseUser
     /**
      * @ORM\Column(type="string", length=10)
      * @Assert\NotBlank()
+     * @Assert\Regex(
+     *     pattern="/(CMC|MKX|FI|INFRES)/",
+     *     message="Promotion invalide ! (Choisir selon CMC, MKX, FI ou INFRES)"
+     * )
      */
     private $promotion;
 

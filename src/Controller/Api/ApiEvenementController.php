@@ -109,9 +109,14 @@ class ApiEvenementController extends ApiController
      *
      * @Security("is_granted('IS_AUTHENTICATED_FULLY')", statusCode=401, message="Vous devez être connecté pour effectuer cette action !"))
      * @Security("event.estAuteur(user) or is_granted('ROLE_ADMIN')", statusCode=403, message="Seul le créateur de l'évènement peut effectuer cette action !")
+     * @throws ResourceValidationException
      */
-    public function modifierEvenement(Request $request, Evenement $event)
+    public function modifierEvenement(Request $request, Evenement $event = null)
     {
+        if (!$event) {
+            throw new ResourceValidationException('Évènement non existant !');
+        }
+
         $em = $this->getDoctrine()->getManager();
         $form = $this->createForm(EvenementType::class, $event);
         $data = json_decode($request->getContent(), true);
@@ -142,15 +147,20 @@ class ApiEvenementController extends ApiController
     }
 
     /**
-     *  @Rest\Delete("/events/{id}", name="supprimer_evenement")
+     * @Rest\Delete("/events/{id}", name="supprimer_evenement")
      *
-     *  @return JsonResponse
+     * @return JsonResponse
      *
-     *  @Security("is_granted('IS_AUTHENTICATED_FULLY')", statusCode=401, message="Vous devez être connecté pour effectuer cette action !"))
-     *  @Security("event.estAuteur(user) or is_granted('ROLE_ADMIN')", statusCode=403, message="Seul le créateur de l'évènement peut effectuer cette action !"))
+     * @Security("is_granted('IS_AUTHENTICATED_FULLY')", statusCode=401, message="Vous devez être connecté pour effectuer cette action !"))
+     * @Security("event.estAuteur(user) or is_granted('ROLE_ADMIN')", statusCode=403, message="Seul le créateur de l'évènement peut effectuer cette action !"))
      *
+     * @throws ResourceValidationException
      */
-    public function supprimerEvenement(Evenement $event) {
+    public function supprimerEvenement(Evenement $event = null) {
+        if (!$event) {
+            throw new ResourceValidationException('Évènement non existant !');
+        }
+
         $em = $this->getDoctrine()->getManager();
         $em->remove($event);
         $em->flush();

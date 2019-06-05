@@ -27,23 +27,28 @@ class Annonce
 
     /**
      * @ORM\Column(type="string", length=100)
-     * @Assert\NotBlank()
+     * @Assert\NotBlank(message="Merci de renseigner un titre !")
      */
     private $titre;
 
     /**
      * @ORM\Column(type="text")
-     * @Assert\NotBlank()
+     * @Assert\NotBlank(message="Merci de renseigner une description !")
      */
     private $description;
 
     /**
      * @ORM\ManyToMany(targetEntity="Image", cascade={"persist"}, fetch="EAGER")
+     * @Assert\Valid()
      */
     private $images;
 
     /**
      * @ORM\Column(type="decimal", precision=7, scale=2)
+     * @Assert\Range(
+     *     min = 0,
+     *     minMessage = "La somme ne peut pas être négative !"
+     *  )
      */
     private $prix;
 

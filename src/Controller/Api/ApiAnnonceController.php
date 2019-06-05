@@ -12,6 +12,7 @@ use FOS\RestBundle\Controller\Annotations as Rest;
 use Symfony\Component\Routing\Annotation\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
  * @Route("/api", name="api_")
@@ -24,13 +25,13 @@ class ApiAnnonceController extends ApiController
      * @return Response
      * @throws ResourceValidationException
      */
-    public function afficherAnnonce(Annonce $annonce)
+    public function afficherAnnonce(Annonce $annonce = null)
     {
-        $data =  $this->get('serializer')->serialize($annonce, 'json', $this->serializer->serialize('annonce'));
-
-        if (!$data) {
+        if (!$annonce) {
             throw new ResourceValidationException('Annonce non existante !');
         }
+
+        $data =  $this->get('serializer')->serialize($annonce, 'json', $this->serializer->serialize('annonce'));
 
         return new Response($data);
     }
@@ -67,7 +68,7 @@ class ApiAnnonceController extends ApiController
      *
      *  @Security("is_granted('ROLE_USER')", statusCode=401, message="Vous devez être connecté pour effectuer cette action !")
      */
-    public function creerAnnonce(Request $request) {
+    public function creerAnnonce(Request $request, ValidatorInterface $validator) {
         $annonce = new Annonce();
 
         $data = json_decode($request->getContent(), true);
@@ -87,6 +88,11 @@ class ApiAnnonceController extends ApiController
             ->setPrix($data['prix'])
             ->setTitre($data['titre']);
 
+        $listErrors = $validator->validate($annonce);
+        if(count($listErrors) > 0) {
+            return new JsonResponse(["error" => (string)$listErrors], 500);
+        }
+
         $em->persist($annonce);
         $em->flush();
 
@@ -94,20 +100,30 @@ class ApiAnnonceController extends ApiController
     }
 
     /**
-     *  @Rest\Put("/annonces/{id}", name="modifier_annonce")
+     * @Rest\Put("/annonces/{id}", name="modifier_annonce")
      *
-     *  @return JsonResponse
+     * @return JsonResponse
      *
-     *  @Security("is_granted('IS_AUTHENTICATED_FULLY')", statusCode=401, message="Vous devez être connecté pour effectuer cette action !"))
-     *  @Security("annonce.estCreateur(user) or is_granted('ROLE_ADMIN')", statusCode=403, message="Seul le créateur de l'annonce peut effectuer cette action !"))
+     * @Security("is_granted('IS_AUTHENTICATED_FULLY')", statusCode=401, message="Vous devez être connecté pour effectuer cette action !"))
+     * @Security("annonce.estCreateur(user) or is_granted('ROLE_ADMIN')", statusCode=403, message="Seul le créateur de l'annonce peut effectuer cette action !"))
+     * @throws ResourceValidationException
      */
-    public function modifierAnnonce(Request $request, Annonce $annonce) {
+    public function modifierAnnonce(Request $request, ValidatorInterface $validator, Annonce $annonce = null) {
+        if (!$annonce) {
+            throw new ResourceValidationException('Annonce non existante !');
+        }
+
         $data = json_decode($request->getContent(), true);
         $em = $this->getDoctrine()->getManager();
 
         $annonce->setDescription($data['description'])
             ->setPrix($data['prix'])
             ->setTitre($data['titre']);
+
+        $listErrors = $validator->validate($annonce);
+        if(count($listErrors) > 0) {
+            return new JsonResponse(["error" => (string)$listErrors], 500);
+        }
 
         $em->persist($annonce);
         $em->flush();
@@ -116,14 +132,19 @@ class ApiAnnonceController extends ApiController
     }
 
     /**
-     *  @Rest\Post("/annonces/{id}/images", name="ajouter_image")
+     * @Rest\Post("/annonces/{id}/images", name="ajouter_image")
      *
-     *  @return JsonResponse
+     * @return JsonResponse
      *
-     *  @Security("is_granted('IS_AUTHENTICATED_FULLY')", statusCode=401, message="Vous devez être connecté pour effectuer cette action !"))
-     *  @Security("annonce.estCreateur(user) or is_granted('ROLE_ADMIN')", statusCode=403, message="Seul le créateur de l'annonce peut effectuer cette action !"))
+     * @Security("is_granted('IS_AUTHENTICATED_FULLY')", statusCode=401, message="Vous devez être connecté pour effectuer cette action !"))
+     * @Security("annonce.estCreateur(user) or is_granted('ROLE_ADMIN')", statusCode=403, message="Seul le créateur de l'annonce peut effectuer cette action !"))
+     * @throws ResourceValidationException
      */
-    public function ajouterImage(Request $request, Annonce $annonce) {
+    public function ajouterImage(Request $request, ValidatorInterface $validator, Annonce $annonce = null) {
+        if (!$annonce) {
+            throw new ResourceValidationException('Annonce non existante !');
+        }
+
         $data = json_decode($request->getContent(), true);
         $em = $this->getDoctrine()->getManager();
 
@@ -140,6 +161,11 @@ class ApiAnnonceController extends ApiController
         $em->persist($image);
         $annonce->addImage($image);
 
+        $listErrors = $validator->validate($annonce);
+        if(count($listErrors) > 0) {
+            return new JsonResponse(["error" => (string)$listErrors], 500);
+        }
+
         $em->persist($annonce);
         $em->flush();
 
@@ -147,17 +173,26 @@ class ApiAnnonceController extends ApiController
     }
 
     /**
-     *  @Rest\Delete("/annonces/{annonce_id}/images/{image_id}", name="enlever_image")
+     * @Rest\Delete("/annonces/{annonce_id}/images/{image_id}", name="enlever_image")
      *
-     *  @ParamConverter("annonce", options={"mapping": {"annonce_id": "id"}})
-     *  @ParamConverter("image", options={"mapping": {"image_id": "id"}})
+     * @ParamConverter("annonce", options={"mapping": {"annonce_id": "id"}})
+     * @ParamConverter("image", options={"mapping": {"image_id": "id"}})
      *
-     *  @return JsonResponse
+     * @return JsonResponse
      *
-     *  @Security("is_granted('IS_AUTHENTICATED_FULLY')", statusCode=401, message="Vous devez être connecté pour effectuer cette action !"))
-     *  @Security("annonce.estCreateur(user) or is_granted('ROLE_ADMIN')", statusCode=403, message="Seul le créateur de l'annonce peut effectuer cette action !"))
+     * @Security("is_granted('IS_AUTHENTICATED_FULLY')", statusCode=401, message="Vous devez être connecté pour effectuer cette action !"))
+     * @Security("annonce.estCreateur(user) or is_granted('ROLE_ADMIN')", statusCode=403, message="Seul le créateur de l'annonce peut effectuer cette action !"))
+     * @throws ResourceValidationException
      */
-    public function supprimerImage(Annonce $annonce, Image $image) {
+    public function supprimerImage(Image $image = null, Annonce $annonce = null) {
+        if (!$annonce) {
+            throw new ResourceValidationException('Annonce non existante !');
+        }
+
+        if (!$image) {
+            throw new ResourceValidationException('Image non existante !');
+        }
+
         $em = $this->getDoctrine()->getManager();
         $annonce->removeImage($image);
         $em->persist($annonce);
@@ -167,14 +202,19 @@ class ApiAnnonceController extends ApiController
     }
 
     /**
-     *  @Rest\Delete("/annonces/{id}", name="supprimer_annonce")
+     * @Rest\Delete("/annonces/{id}", name="supprimer_annonce")
      *
-     *  @return JsonResponse
+     * @return JsonResponse
      *
-     *  @Security("is_granted('IS_AUTHENTICATED_FULLY')", statusCode=401, message="Vous devez être connecté pour effectuer cette action !"))
-     *  @Security("annonce.estCreateur(user) or is_granted('ROLE_ADMIN')", statusCode=403, message="Seul le créateur de l'annonce peut effectuer cette action !"))
+     * @Security("is_granted('IS_AUTHENTICATED_FULLY')", statusCode=401, message="Vous devez être connecté pour effectuer cette action !"))
+     * @Security("annonce.estCreateur(user) or is_granted('ROLE_ADMIN')", statusCode=403, message="Seul le créateur de l'annonce peut effectuer cette action !"))
+     * @throws ResourceValidationException
      */
     public function supprimerAnnonce(Annonce $annonce) {
+        if (!$annonce) {
+            throw new ResourceValidationException('Annonce non existante !');
+        }
+
         $em = $this->getDoctrine()->getManager();
         $em->remove($annonce);
         $em->flush();

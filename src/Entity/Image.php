@@ -20,13 +20,13 @@ class Image
 
     /**
      * @ORM\Column(name="url", type="string", length=255)
-     * @Assert\NotBlank()
+     * @Assert\NotBlank(message="Merci de renseigner une url !")
      */
     private $url;
 
     /**
      * @ORM\Column(name="alt", type="string", length=255)
-     * @Assert\NotBlank()
+     * @Assert\NotBlank(message="Merci de renseigner un nom d'image !")
      */
     private $alt;
 
