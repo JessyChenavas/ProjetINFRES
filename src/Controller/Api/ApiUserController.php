@@ -34,7 +34,7 @@ class ApiUserController extends ApiController
             throw new ResourceValidationException('Utilisateur non existant !');
         }
 
-        $data =  $this->get('serializer')->serialize($user, 'json', $this->serializer->serialize('user'));
+        $data = $this->get('serializer')->serialize($user, 'json', $this->serializer->serialize('user'));
 
         return new Response($data);
     }
@@ -125,6 +125,26 @@ class ApiUserController extends ApiController
         }
 
         return new JsonResponse(["success" => sprintf("%s a été modifié !", $user->getUsername())], 200);
+    }
+
+    /**
+     * @Rest\Delete("/users/{id}", name="supprimer_utilisateur")
+     *
+     * @return JsonResponse
+     *
+     * @Security("is_granted('ROLE_ADMIN')", statusCode=403, message="Seul un administrateur est autorisé !")
+     * @throws ResourceValidationException
+     */
+    public function supprimerUtilisateur(User $user = null) {
+        if (!$user) {
+            throw new ResourceValidationException('Utilisateur non existant !');
+        }
+
+        $em = $this->getDoctrine()->getManager();
+        $em->remove($user);
+        $em->flush();
+
+        return new JsonResponse(["success" => "L'utilisateur a été supprimé !"], 200);
     }
 
     /**
