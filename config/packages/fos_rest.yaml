@@ -15,3 +15,5 @@ fos_rest:
             json: true
     exception:
         enabled: true
+        codes:
+          { App\Exception\ResourceValidationException: 404 }

@@ -1,10 +1,12 @@
 <?php
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
+
 /**
- * @ORM\Entity
+ * @ORM\Entity (repositoryClass="App\Repository\EvenementRepository")
  * @ORM\Table(name="evenement")
  */
 class Evenement {
@@ -14,24 +16,22 @@ class Evenement {
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
-    /**
-     * @ORM\Column(type="string", length=100)
-     * @Assert\NotBlank()
-     *
-     */
-    private $titre;
-    /**
-     * @ORM\Column(type="text")
-     * @Assert\NotBlank()
-     */
-    private $description;
-    /**
-     * @return mixed
-     */
 
     /**
      * @ORM\Column(type="string", length=100)
-     * @Assert\NotBlank()
+     * @Assert\NotBlank(message="Merci de renseigner un titre !")
+     */
+    private $titre;
+
+    /**
+     * @ORM\Column(type="text")
+     * @Assert\NotBlank(message="Merci de renseigner une description !")
+     */
+    private $description;
+
+    /**
+     * @ORM\Column(type="string", length=100)
+     * @Assert\NotBlank(message="Merci de renseigner un lieu !")
      */
     private $lieu;
 
@@ -45,11 +45,38 @@ class Evenement {
     private $date;
 
     /**
+     * @ORM\ManyToOne(targetEntity="User", cascade={"persist"}, fetch="EAGER")
+     * @ORM\JoinColumn(nullable=false)
+     * @Assert\Valid()
+     */
+    private $auteur;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="Image", cascade={"persist"}, fetch="EAGER")
+     * @ORM\JoinColumn(nullable=true)
+     * @Assert\Valid()
+     */
+    private $image;
+
+    /**
+     * @ORM\ManyToMany(targetEntity="User", cascade={"persist"}, fetch="EAGER")
+     * @ORM\JoinColumn(nullable=false)
+     * @Assert\Valid()
+     */
+    private $participants;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $limiteParticipants;
+
+    /**
      * @param $date
      */
     public function __construct()
     {
         $this->date = new \DateTime();
+        $this->participants = new ArrayCollection();
     }
 
     /**
@@ -123,4 +150,88 @@ class Evenement {
     {
         $this->description = $description;
     }
+
+    /**
+     * @return mixed
+     */
+    public function getAuteur()
+    {
+        return $this->auteur;
+    }
+
+    /**
+     * @param mixed $author
+     */
+    public function setAuteur(User $auteur)
+    {
+        $this->auteur = $auteur;
+    }
+
+    /**
+     * @return bool
+     */
+    public function estAuteur(User $user = null) {
+        return $user && $user->getId() === $this->getAuteur()->getId();
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getImage()
+    {
+        return $this->image;
+    }
+
+    /**
+     * @param mixed $image
+     */
+    public function setImage(Image $image)
+    {
+        $this->image = $image;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getParticipants()
+    {
+        return $this->participants;
+    }
+
+    public function addParticipant(User $user)  {
+        $ajoutDisponible = !$this->estComplet();
+
+        if ($ajoutDisponible) {
+            if ($this->participants->contains($user)) { return 0; }
+            $this->participants[] = $user;
+        }
+
+        return $ajoutDisponible;
+    }
+
+   public function removeParticipant(User $user) {
+        $this->participants->removeElement($user);
+   }
+
+    /**
+     * @return mixed
+     */
+    public function getLimiteParticipants()
+    {
+        return $this->limiteParticipants;
+    }
+
+    /**
+     * @param mixed $limiteParticipants
+     */
+    public function setLimiteParticipants($limiteParticipants)
+    {
+        $this->limiteParticipants = $limiteParticipants;
+    }
+
+   public function estComplet () {
+        if (!$this->limiteParticipants) { return 0; }
+
+        return $this->participants->count() >= $this->limiteParticipants;
+   }
 }

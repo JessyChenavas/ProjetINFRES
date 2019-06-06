@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Entity;
+
 use FOS\UserBundle\Model\User as BaseUser;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -47,6 +48,10 @@ class User extends BaseUser
     /**
      * @ORM\Column(type="string", length=10)
      * @Assert\NotBlank()
+     * @Assert\Regex(
+     *     pattern="/(CMC|MKX|FI|INFRES)/",
+     *     message="Promotion invalide ! (Choisir selon CMC, MKX, FI ou INFRES)"
+     * )
      */
     private $promotion;
 
@@ -60,7 +65,6 @@ class User extends BaseUser
     public function __construct()
     {
         parent::__construct();
-        // your own logic
     }
     /**
      * @return mixed
@@ -84,6 +88,8 @@ class User extends BaseUser
     public function setPromotion($promotion)
     {
         $this->promotion = $promotion;
+
+        return $this;
     }
 
     /**
@@ -100,6 +106,8 @@ class User extends BaseUser
     public function setVoiture(Voiture $voiture)
     {
         $this->voiture = $voiture;
+
+        return $this;
     }
 
     /**
@@ -116,6 +124,8 @@ class User extends BaseUser
     public function setDateNaissance($dateNaissance)
     {
         $this->dateNaissance = $dateNaissance;
+
+        return $this;
     }
 
     /**
@@ -132,6 +142,8 @@ class User extends BaseUser
     public function setGenre($genre)
     {
         $this->genre = $genre;
+
+        return $this;
     }
 
     /**
@@ -148,6 +160,8 @@ class User extends BaseUser
     public function setNom($nom)
     {
         $this->nom = $nom;
+
+        return $this;
     }
 
     /**
@@ -164,5 +178,12 @@ class User extends BaseUser
     public function setPrenom($prenom)
     {
         $this->prenom = $prenom;
+
+        return $this;
+    }
+
+    public function updateRole($role) {
+        $this->roles = array();
+        $this->addRole($role);
     }
 }

@@ -10,8 +10,6 @@ use App\Entity\User;
 use App\Entity\Voiture;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Symfony\Component\Validator\Validation;
-use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
@@ -21,45 +19,45 @@ class ApiAuthController extends AbstractController
 {
     /**
      * @Rest\Post("/register")
-
      * @return JsonResponse
      */
     public function register(Request $request, UserManagerInterface $userManager, ValidatorInterface $validator)
     {
-        $data = json_decode(
-            $request->getContent(),
-            true
-        );
+        $data = json_decode($request->getContent(), true);
+        $em = $this->getDoctrine()->getManager();
 
         $user = new User();
 
-        if (preg_match("/(CMC|MKX|FI|INFRES)/", $data['promotion'])) {
-            $user->setPromotion($data['promotion']);
-        }
-
        if (isset($data['voiture'])) {
-           $voiture = new Voiture();
 
-           $voiture->setCouleur($data['voiture']['couleur']);
-           $voiture->setMarque($data['voiture']['marque']);
-           $voiture->setModele($data['voiture']['modele']);
+           $voiture = $this->getDoctrine()
+               ->getRepository(Voiture::class)
+               ->findOneBy(['couleur' => $data['voiture']['couleur'], 'marque' => $data['voiture']['marque'], 'modele' => $data['voiture']['modele']]);
+
+           if (!$voiture) {
+               $voiture = new Voiture();
+               $voiture->setCouleur($data['voiture']['couleur']);
+               $voiture->setMarque($data['voiture']['marque']);
+               $voiture->setModele($data['voiture']['modele']);
+
+               $em->persist($voiture);
+           }
 
            $user->setVoiture($voiture);
         }
 
-       $user->setGenre($data['genre']);
-       $user->setPrenom($data['prenom']);
-       $user->setNom($data['nom']);
-       $user->setDateNaissance(new \DateTime($data['dateNaissance']));
-
-       $user
+        $user
             ->setUsername($data['username'])
             ->setPlainPassword($data['password'])
             ->setEmail($data['email'])
             ->setEnabled(true)
             ->setRoles(['ROLE_USER'])
             ->setSuperAdmin(false)
-        ;
+            ->setGenre($data['genre'])
+            ->setPrenom($data['prenom'])
+            ->setNom($data['nom'])
+            ->setDateNaissance(new \DateTime($data['dateNaissance']))
+            ->setPromotion($data['promotion']);
 
         $listErrors = $validator->validate($user);
         if(count($listErrors) > 0) {
@@ -67,11 +65,13 @@ class ApiAuthController extends AbstractController
         }
 
         try {
+            $em->flush();
             $userManager->updateUser($user, true);
         } catch (\Exception $e) {
-            return new JsonResponse(["error" => "ERROR : ".$e->getMessage()], 500);
+          # return new JsonResponse(["error" => "ERROR : ".$e->getMessage()], 500);
+            return new JsonResponse(["error" => "L'email/username est déjà utilisé !"], 500);
         }
 
-        return new JsonResponse(["success" => $user->getUsername(). " has been registered!"], 200);
+        return new JsonResponse(["success" => sprintf("%s a bien été inscrit ! ", $user->getUsername())], 201);
     }
 }

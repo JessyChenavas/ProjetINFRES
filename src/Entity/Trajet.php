@@ -25,17 +25,17 @@ class Trajet
      * @ORM\JoinColumn(nullable=false)
      * @Assert\Valid()
      */
-    private $creator;
+    private $createur;
 
     /**
      * @ORM\Column(type="string", length=100)
-     * @Assert\NotBlank()
+     * @Assert\NotBlank(message="Merci de renseigner un lieu de départ !")
      */
     private $lieuDepart;
 
     /**
      * @ORM\Column(type="string", length=100)
-     * @Assert\NotBlank()
+     * @Assert\NotBlank(message="Merci de renseigner un lieu d'arrivé !")
      */
     private $lieuArrive;
 
@@ -44,7 +44,7 @@ class Trajet
      * @Assert\DateTime()
      * @Assert\GreaterThan(
      *     "+5 minutes",
-     *     message = "Merci de renseigner une date valable (au moins 5 minutes après la date actuelle)")
+     *     message = "Merci de renseigner une date valable ! (au moins 5 minutes après la date actuelle)")
      */
     private $heureDepart;
 
@@ -52,19 +52,22 @@ class Trajet
      * @ORM\Column(type="integer")
      * @Assert\Range(
      *      min = 1,
-     *      minMessage = "Merci de renseigner un chiffre strictement supérieur à 0"
+     *      minMessage = "Merci de renseigner au moins un passager maximal !"
      * )
      */
     private $passagersMax;
 
     /**
      * @ORM\ManyToMany(targetEntity="User", cascade={"persist"})
+     * @Assert\Valid()
      */
     private $passagers;
 
     /**
      * @ORM\Column(type="decimal", precision=7, scale=2)
      * @Assert\Range(
+     *     min = 0,
+     *     minMessage = "La somme ne peut pas être négative !",
      *     max = 50,
      *     maxMessage = "La somme doit être inférieure à 50€"
      *  )
@@ -80,17 +83,19 @@ class Trajet
     /**
      * @return mixed
      */
-    public function getCreator()
+    public function getCreateur()
     {
-        return $this->creator;
+        return $this->createur;
     }
 
     /**
-     * @param mixed $creator
+     * @param mixed $createur
      */
-    public function setCreator(User $creator)
+    public function setCreateur(User $createur)
     {
-        $this->creator = $creator;
+        $this->createur = $createur;
+
+        return $this;
     }
 
     /**
@@ -107,6 +112,8 @@ class Trajet
     public function setLieuDepart($lieuDepart)
     {
         $this->lieuDepart = $lieuDepart;
+
+        return $this;
     }
 
     /**
@@ -123,6 +130,8 @@ class Trajet
     public function setLieuArrive($lieuArrive)
     {
         $this->lieuArrive = $lieuArrive;
+
+        return $this;
     }
 
     /**
@@ -139,6 +148,8 @@ class Trajet
     public function setHeureDepart($heureDepart)
     {
         $this->heureDepart = $heureDepart;
+
+        return $this;
     }
 
     /**
@@ -155,6 +166,8 @@ class Trajet
     public function setPassagersMax($passagersMax)
     {
         $this->passagersMax = $passagersMax;
+
+        return $this;
     }
 
     /**
@@ -197,11 +210,31 @@ class Trajet
     }
 
     /**
+     * @return mixed
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * @param mixed $id
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+
+        return $this;
+    }
+
+    /**
      * @param mixed $tarif
      */
     public function setTarif($tarif)
     {
         $this->tarif = $tarif;
+
+        return $this;
     }
 
     /**
@@ -209,5 +242,12 @@ class Trajet
      */
     public function estPlein() {
         return $this->passagers->count() >= $this->passagersMax;
+    }
+
+    /**
+     * @return bool
+     */
+    public function estCreateur(User $user = null) {
+        return $user && $user->getId() === $this->getCreateur()->getId();
     }
 }
