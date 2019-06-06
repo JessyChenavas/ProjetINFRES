@@ -4,9 +4,9 @@ namespace App\Controller\Api;
 
 class SerializationController
 {
-    private $user_resume =  ['id', 'username', 'email', 'roles', 'nom', 'prenom', 'genre', 'dateNaissance', 'promotion'];
+    private $user_resume =  ['id', 'username', 'email', 'roles', 'nom', 'prenom', 'genre', 'dateNaissance', 'promotion', 'telephone'];
 
-    private $user_detail = ['id', 'username', 'email', 'roles', 'nom', 'prenom', 'genre', 'dateNaissance', 'promotion',
+    private $user_detail = ['id', 'username', 'email', 'roles', 'nom', 'prenom', 'genre', 'dateNaissance', 'promotion', 'telephone',
     'voiture' => ['modele', 'marque', 'couleur']];
 
 

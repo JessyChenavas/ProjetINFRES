@@ -5,7 +5,6 @@ namespace App\Entity;
 use FOS\UserBundle\Model\User as BaseUser;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
-use App\Entity\Voiture;
 
 /**
  * @ORM\Entity
@@ -61,6 +60,15 @@ class User extends BaseUser
      * @Assert\Valid()
      */
     private $voiture;
+
+    /**
+     * @ORM\Column(type="string", nullable=true)
+     * @Assert\Regex(
+     *     pattern="/^0[1-9]\d{8}$/",
+     *     message="Numéro de téléphone invalide"
+     * )
+     */
+    private $telephone;
 
     public function __construct()
     {
@@ -185,5 +193,21 @@ class User extends BaseUser
     public function updateRole($role) {
         $this->roles = array();
         $this->addRole($role);
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getTelephone()
+    {
+        return $this->telephone;
+    }
+
+    /**
+     * @param mixed $telephone
+     */
+    public function setTelephone($telephone)
+    {
+        $this->telephone = $telephone;
     }
 }

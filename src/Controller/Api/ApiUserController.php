@@ -99,6 +99,10 @@ class ApiUserController extends ApiController
             $user->setVoiture($voiture);
         }
 
+        if (isset($data['telephone'])) {
+            $user->setTelephone($data['telephone']);
+        }
+
         $user->setPlainPassword($data['password'])
             ->setGenre($data['genre'])
             ->setPrenom($data['prenom'])
