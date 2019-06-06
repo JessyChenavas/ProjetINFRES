@@ -11,11 +11,13 @@ use App\Entity\Voiture;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Monolog\Logger;
+use Monolog\Handler\StreamHandler;
 
 /**
  * @Route("/auth", name="auth_")
  */
-class ApiAuthController extends AbstractController
+class ApiAuthController extends ApiController
 {
     /**
      * @Rest\Post("/register")
@@ -24,6 +26,11 @@ class ApiAuthController extends AbstractController
     public function register(Request $request, UserManagerInterface $userManager, ValidatorInterface $validator)
     {
         $data = json_decode($request->getContent(), true);
+
+        // Log de la request
+        $this->log->info('REQUEST;AuthRegister;POST|',$data);
+
+        
         $em = $this->getDoctrine()->getManager();
 
         $user = new User();
@@ -69,9 +76,20 @@ class ApiAuthController extends AbstractController
             $userManager->updateUser($user, true);
         } catch (\Exception $e) {
           # return new JsonResponse(["error" => "ERROR : ".$e->getMessage()], 500);
-            return new JsonResponse(["error" => "L'email/username est déjà utilisé !"], 500);
+            $responsejson = new JsonResponse(["error" => "L'email/username est déjà utilisé !"], 500);
+            $response = json_decode($responsejson->getContent(), true);
+
+            // Log de la response
+            $this->log->error('RESPONSE;AuthRegister;POST|',$response);
+            return $responsejson;
         }
 
-        return new JsonResponse(["success" => sprintf("%s a bien été inscrit ! ", $user->getUsername())], 201);
+        $responsejson = new JsonResponse(["success" => sprintf("%s a bien été inscrit ! ", $user->getUsername())], 201);
+        $response = json_decode($responsejson->getContent(), true);
+            
+        // Log de la response
+        $this->log->info('RESPONSE;AuthRegister;POST|',$response);
+        return $responsejson;
+        
     }
 }
