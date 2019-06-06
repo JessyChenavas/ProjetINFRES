@@ -230,11 +230,7 @@ class ApiTrajetController extends ApiController
                 409);
         }
 
-        if ($trajet->addPassager($user)) {
-            $json_response = new JsonResponse(
-                ["success" => sprintf("Le passager %s a été ajouté au trajet de %s ! ", $user->getUsername(), $trajet->getCreateur()->getUsername())],
-                201);
-        } else {
+        if (!$trajet->addPassager($user)) {
             return new JsonResponse(
                 ["error" => "L'ajout n'a pas été effectué : le trajet est complet ou le passager est déjà inscrit."],
                 409);
@@ -244,7 +240,9 @@ class ApiTrajetController extends ApiController
         $em->persist($trajet);
         $em->flush();
 
-        return $json_response;
+        return new JsonResponse(
+            ["success" => sprintf("Le passager %s a été ajouté au trajet de %s ! ", $user->getUsername(), $trajet->getCreateur()->getUsername())],
+            201);
     }
 
     /**

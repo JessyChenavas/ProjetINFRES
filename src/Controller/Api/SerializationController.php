@@ -29,7 +29,7 @@ class SerializationController
                 break;
 
             case 'evenement':
-                $serialization = [ 'id', 'titre', 'description', 'lieu', 'date', 'image', 'auteur' => $this->user_resume ];
+                $serialization = [ 'id', 'titre', 'description', 'lieu', 'date', 'image', 'limiteParticipants' ,'auteur' => $this->user_resume, 'participants' => $this->user_resume ];
                 break;
 
             case 'annonce':
