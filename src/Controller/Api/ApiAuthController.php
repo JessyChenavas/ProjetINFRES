@@ -53,6 +53,10 @@ class ApiAuthController extends ApiController
            $user->setVoiture($voiture);
         }
 
+       if (isset($data['telephone'])) {
+           $user->setTelephone($data['telephone']);
+       }
+
         $user
             ->setUsername($data['username'])
             ->setPlainPassword($data['password'])
