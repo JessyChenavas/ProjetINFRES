@@ -28,7 +28,7 @@ class ApiAuthController extends ApiController
         $data = json_decode($request->getContent(), true);
 
         // Log de la request
-        $this->log->info('REQUEST;AuthRegister;POST|',$data);
+        $this->log->info('REQUEST;/auth/Register;POST|',$data);
 
         
         $em = $this->getDoctrine()->getManager();
@@ -68,7 +68,12 @@ class ApiAuthController extends ApiController
 
         $listErrors = $validator->validate($user);
         if(count($listErrors) > 0) {
-            return new JsonResponse(["error" => (string)$listErrors], 500);
+            $responsejson = new JsonResponse(["error" => (string)$listErrors], 500);
+            $response = json_decode($responsejson->getContent(), true);
+
+            // Log de la response
+            $this->log->error('RESPONSE;/auth/Register;POST|',$response);
+            return $responsejson;
         }
 
         try {
@@ -80,7 +85,7 @@ class ApiAuthController extends ApiController
             $response = json_decode($responsejson->getContent(), true);
 
             // Log de la response
-            $this->log->error('RESPONSE;AuthRegister;POST|',$response);
+            $this->log->error('RESPONSE;/auth/Register;POST|',$response);
             return $responsejson;
         }
 
@@ -88,7 +93,7 @@ class ApiAuthController extends ApiController
         $response = json_decode($responsejson->getContent(), true);
             
         // Log de la response
-        $this->log->info('RESPONSE;AuthRegister;POST|',$response);
+        $this->log->info('RESPONSE;/auth/Register;POST|',$response);
         return $responsejson;
         
     }
