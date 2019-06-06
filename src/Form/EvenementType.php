@@ -1,6 +1,7 @@
 <?php
 namespace App\Form;
 
+use phpDocumentor\Reflection\Types\Integer;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -18,8 +19,9 @@ class EvenementType extends AbstractType
             ->add('lieu')
             ->add('date', DateTimeType::class, [
                 'widget' => 'single_text'])
-            ->add('save', SubmitType::class)
+            ->add('limiteParticipants',null, ['required' => false])
             ->add('image', ImageType::class, ['required' => false])
+            ->add('save', SubmitType::class)
         ;
     }
     public function configureOptions(OptionsResolver $resolver)

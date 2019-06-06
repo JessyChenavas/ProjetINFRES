@@ -1,12 +1,12 @@
 <?php
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
-use App\Entity\User;
 
 /**
- * @ORM\Entity
+ * @ORM\Entity (repositoryClass="App\Repository\EvenementRepository")
  * @ORM\Table(name="evenement")
  */
 class Evenement {
@@ -28,9 +28,6 @@ class Evenement {
      * @Assert\NotBlank(message="Merci de renseigner une description !")
      */
     private $description;
-    /**
-     * @return mixed
-     */
 
     /**
      * @ORM\Column(type="string", length=100)
@@ -62,11 +59,24 @@ class Evenement {
     private $image;
 
     /**
+     * @ORM\ManyToMany(targetEntity="User", cascade={"persist"}, fetch="EAGER")
+     * @ORM\JoinColumn(nullable=false)
+     * @Assert\Valid()
+     */
+    private $participants;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $limiteParticipants;
+
+    /**
      * @param $date
      */
     public function __construct()
     {
         $this->date = new \DateTime();
+        $this->participants = new ArrayCollection();
     }
 
     /**
@@ -179,4 +189,49 @@ class Evenement {
     {
         $this->image = $image;
     }
+
+    /**
+     * @return mixed
+     */
+    public function getParticipants()
+    {
+        return $this->participants;
+    }
+
+    public function addParticipant(User $user)  {
+        $ajoutDisponible = !$this->estComplet();
+
+        if ($ajoutDisponible) {
+            if ($this->participants->contains($user)) { return 0; }
+            $this->participants[] = $user;
+        }
+
+        return $ajoutDisponible;
+    }
+
+   public function removeParticipant(User $user) {
+        $this->participants->removeElement($user);
+   }
+
+    /**
+     * @return mixed
+     */
+    public function getLimiteParticipants()
+    {
+        return $this->limiteParticipants;
+    }
+
+    /**
+     * @param mixed $limiteParticipants
+     */
+    public function setLimiteParticipants($limiteParticipants)
+    {
+        $this->limiteParticipants = $limiteParticipants;
+    }
+
+   public function estComplet () {
+        if (!$this->limiteParticipants) { return 0; }
+
+        return $this->participants->count() >= $this->limiteParticipants;
+   }
 }
