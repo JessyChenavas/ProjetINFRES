@@ -27,6 +27,7 @@ class Conversation
 
     /**
      * @ORM\OneToMany(targetEntity="Message", mappedBy="conversation")
+     * @ORM\OrderBy({"date" = "DESC"})
      * @Assert\Valid()
      */
     private $messages;
