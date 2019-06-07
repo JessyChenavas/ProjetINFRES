@@ -38,9 +38,7 @@ class ApiEvenementController extends ApiController
         }
 
         $paginatedCollection = $this->paginator->paginate($events, $page, 5);
-        $serialization = $this->serializer->serialize('evenement', true);
-
-        $data =  $this->get('serializer')->serialize($paginatedCollection, 'json', $serialization);
+        $data = $this->serializer->serialize($paginatedCollection, 'json');
 
         return new Response($data);
     }
@@ -57,7 +55,7 @@ class ApiEvenementController extends ApiController
             throw new ResourceValidationException('Évènement non existant !');
         }
 
-        $data =  $this->get('serializer')->serialize($event, 'json', $this->serializer->serialize('evenement'));
+        $data = $this->serializer->serialize($event, 'json');
 
         return new Response($data);
     }
@@ -87,9 +85,8 @@ class ApiEvenementController extends ApiController
         }
 
         $paginatedCollection = $this->paginator->paginate($events, $page, 5);
-        $serialization = $this->serializer->serialize('evenement', true);
 
-        $data = $this->get('serializer')->serialize($paginatedCollection, 'json', $serialization);
+        $data = $this->serializer->serialize($paginatedCollection, 'json');
 
         return new Response($data);
     }

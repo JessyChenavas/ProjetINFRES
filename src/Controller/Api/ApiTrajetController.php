@@ -31,14 +31,14 @@ class ApiTrajetController extends ApiController
             throw new ResourceValidationException('Trajet non existant !');
         }
 
-        $data =  $this->get('serializer')->serialize($trajet, 'json', $this->serializer->serialize('trajet'));
+        $data = $this->serializer->serialize($trajet, 'json');
 
         return new Response($data);
     }
 
     /**
-     * @Rest\Get("/trajets/users/{id}", defaults={"page" = 1}, name="afficher_trajets_utilisateur")
-     * @Rest\Get("/trajets/users/{id}/page{page}", name="afficher_trajets_utilisateur_pagine")
+     * @Rest\Get("/users/{id}/trajets", defaults={"page" = 1}, name="afficher_trajets_utilisateur")
+     * @Rest\Get("/users/{id}/trajets/page{page}", name="afficher_trajets_utilisateur_pagine")
      *
      * @return Response
      * @throws ResourceValidationException
@@ -57,9 +57,7 @@ class ApiTrajetController extends ApiController
         }
 
         $paginatedCollection = $this->paginator->paginate($trajets, $page, 10);
-        $serialization = $this->serializer->serialize('trajet', true);
-
-        $data = $this->get('serializer')->serialize($paginatedCollection, 'json', $serialization);
+        $data = $this->serializer->serialize($paginatedCollection, 'json');
 
         return new Response($data);
     }
@@ -81,9 +79,7 @@ class ApiTrajetController extends ApiController
         }
 
         $paginatedCollection = $this->paginator->paginate($trajets, $page, 10);
-        $serialization = $this->serializer->serialize('trajet', true);
-
-        $data = $this->get('serializer')->serialize($paginatedCollection, 'json', $serialization);
+        $data = $this->serializer->serialize($paginatedCollection, 'json');
 
         return new Response($data);
     }
@@ -104,9 +100,7 @@ class ApiTrajetController extends ApiController
         }
 
         $paginatedCollection = $this->paginator->paginate($trajets, $page, 10);
-        $serialization = $this->serializer->serialize('trajet', true);
-
-        $data = $this->get('serializer')->serialize($paginatedCollection, 'json', $serialization);
+        $data = $this->serializer->serialize($paginatedCollection, 'json');
 
         return new Response($data);
     }

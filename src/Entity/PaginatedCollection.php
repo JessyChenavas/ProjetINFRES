@@ -3,16 +3,29 @@
 namespace App\Entity;
 
 use Pagerfanta\Pagerfanta;
+use JMS\Serializer\Annotation as Serializer;
 
+/**
+ * @Serializer\ExclusionPolicy("all")
+ */
 class PaginatedCollection
 {
+    public $all_datas;
+
+    /**
+     * * @Serializer\Expose()
+     */
     public $data;
 
+    /**
+     * @Serializer\Expose()
+     */
     public $meta;
 
     public function __construct(Pagerfanta $data)
     {
-        $this->data = $data;
+        $this->all_datas = $data;
+        $this->data = $data->getCurrentPageResults();
 
         $this->addMeta('limit', $data->getMaxPerPage())
             ->addMeta('current_items', count($data->getCurrentPageResults()))

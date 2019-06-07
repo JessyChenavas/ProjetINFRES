@@ -4,10 +4,29 @@ namespace App\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
+use Hateoas\Configuration\Annotation as Hateoas;
+use JMS\Serializer\Annotation as Serializer;
 
 /**
  * @ORM\Entity (repositoryClass="App\Repository\EvenementRepository")
  * @ORM\Table(name="evenement")
+ *
+ * @Hateoas\Relation("self",
+ *      href = @Hateoas\Route("api_afficher_evenement", parameters = { "id" = "expr(object.getId())" }))
+ *
+ * @Hateoas\Relation("edit",
+ *      href = @Hateoas\Route("api_modifier_evenement", parameters = { "id" = "expr(object.getId())" }))
+ *
+ * @Hateoas\Relation("delete",
+ *      href = @Hateoas\Route("api_supprimer_evenement", parameters = { "id" = "expr(object.getId())" }))
+ *
+ *  @Hateoas\Relation("image", embedded = "expr(object.getImage())",
+ *   exclusion = @Hateoas\Exclusion(excludeIf = "expr(object.getImage() === null)"))
+ *
+ * @Hateoas\Relation("auteur", embedded = "expr(object.getAuteur())")
+ *
+ * @Hateoas\Relation("participants", embedded = "expr(object.getParticipants())",
+ *   exclusion = @Hateoas\Exclusion(excludeIf = "expr(object.getParticipants() === null)"))
  */
 class Evenement {
     /**
@@ -48,6 +67,8 @@ class Evenement {
      * @ORM\ManyToOne(targetEntity="User", cascade={"persist"}, fetch="EAGER")
      * @ORM\JoinColumn(nullable=false)
      * @Assert\Valid()
+     *
+     * @Serializer\Exclude()
      */
     private $auteur;
 
@@ -55,6 +76,8 @@ class Evenement {
      * @ORM\ManyToOne(targetEntity="Image", cascade={"persist"}, fetch="EAGER")
      * @ORM\JoinColumn(nullable=true)
      * @Assert\Valid()
+     *
+     * @Serializer\Exclude()
      */
     private $image;
 
@@ -62,6 +85,8 @@ class Evenement {
      * @ORM\ManyToMany(targetEntity="User", cascade={"persist"}, fetch="EAGER")
      * @ORM\JoinColumn(nullable=false)
      * @Assert\Valid()
+     *
+     * @Serializer\Exclude()
      */
     private $participants;
 

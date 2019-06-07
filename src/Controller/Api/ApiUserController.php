@@ -23,7 +23,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 class ApiUserController extends ApiController
 {
     /**
-     * @Rest\Get("/users/{id}", name="afficher_utlisateur", requirements={"id" = "\d+"})
+     * @Rest\Get("/users/{id}", name="afficher_utilisateur", requirements={"id" = "\d+"})
      *
      * @return Response
      * @throws ResourceValidationException
@@ -34,7 +34,7 @@ class ApiUserController extends ApiController
             throw new ResourceValidationException('Utilisateur non existant !');
         }
 
-        $data = $this->get('serializer')->serialize($user, 'json', $this->serializer->serialize('user'));
+        $data = $this->serializer->serialize($user, 'json');
 
         return new Response($data);
     }
@@ -57,9 +57,7 @@ class ApiUserController extends ApiController
         }
 
         $paginatedCollection = $this->paginator->paginate($users, $page, 5);
-        $serialization = $this->serializer->serialize('user', true);
-
-        $data = $this->get('serializer')->serialize($paginatedCollection, 'json', $serialization);
+        $data = $this->serializer->serialize($paginatedCollection, 'json');
 
         return new Response($data);
     }

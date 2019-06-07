@@ -5,10 +5,34 @@ namespace App\Entity;
 use FOS\UserBundle\Model\User as BaseUser;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
+use Hateoas\Configuration\Annotation as Hateoas;
+use JMS\Serializer\Annotation as Serializer;
 
 /**
  * @ORM\Entity
  * @ORM\Table(name="fos_user")
+ *
+ * @Hateoas\Relation("self",
+ *      href = @Hateoas\Route("api_afficher_utilisateur", parameters = { "id" = "expr(object.getId())" }))
+ *
+ * @Hateoas\Relation("edit",
+ *      href = @Hateoas\Route("api_modifier_utilisateur", parameters = { "id" = "expr(object.getId())" }))
+ *
+ * @Hateoas\Relation("delete",
+ *      href = @Hateoas\Route("api_supprimer_utilisateur", parameters = { "id" = "expr(object.getId())" }))
+ *
+ * @Hateoas\Relation("send_message",
+ *     href = @Hateoas\Route("api_envoyer_message", parameters = { "id" = "expr(object.getId())" }))
+ *
+ * @Hateoas\Relation("show_agenda",
+ *     href = @Hateoas\Route("api_afficher_agenda_utilisateur", parameters = { "id" = "expr(object.getId())" }))
+ *
+ * @Hateoas\Relation("show_trajets",
+ *     href = @Hateoas\Route("api_afficher_trajets_utilisateur", parameters = { "id" = "expr(object.getId())" }))
+ *
+ *  @Hateoas\Relation("voiture", embedded = "expr(object.getVoiture())",
+ *   exclusion = @Hateoas\Exclusion(excludeIf = "expr(object.getVoiture() === null)")
+ * )
  */
 class User extends BaseUser
 {
@@ -16,6 +40,7 @@ class User extends BaseUser
      * @ORM\Id
      * @ORM\Column(type="integer")
      * @ORM\GeneratedValue(strategy="AUTO")
+     * @Serializer\Groups({"summary", "details"})
      */
     protected $id;
 
@@ -58,6 +83,8 @@ class User extends BaseUser
      * @ORM\ManyToOne(targetEntity="Voiture", cascade={"persist"}, fetch="EAGER")
      * @ORM\JoinColumn(nullable=true)
      * @Assert\Valid()
+     *
+     * @Serializer\Exclude()
      */
     private $voiture;
 

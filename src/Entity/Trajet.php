@@ -6,10 +6,26 @@ namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Validator\Constraints as Assert;
+use Hateoas\Configuration\Annotation as Hateoas;
+use JMS\Serializer\Annotation as Serializer;
 
 /**
  * @ORM\Entity
  * @ORM\Table(name="trajet")
+ *
+ * @Hateoas\Relation("self",
+ *      href = @Hateoas\Route("api_afficher_trajet", parameters = { "id" = "expr(object.getId())" }))
+ *
+ * @Hateoas\Relation("edit",
+ *      href = @Hateoas\Route("api_modifier_trajet", parameters = { "id" = "expr(object.getId())" }))
+ *
+ * @Hateoas\Relation("delete",
+ *      href = @Hateoas\Route("api_supprimer_trajet", parameters = { "id" = "expr(object.getId())" }))
+ *
+ *  @Hateoas\Relation("createur", embedded = "expr(object.getCreateur())")
+ *
+ *  @Hateoas\Relation("passagers", embedded = "expr(object.getPassagers())")
+ * )
  */
 class Trajet
 {
@@ -24,6 +40,8 @@ class Trajet
      * @ORM\ManyToOne(targetEntity="User", cascade={"persist"}, fetch="EAGER")
      * @ORM\JoinColumn(nullable=false)
      * @Assert\Valid()
+     *
+     * @Serializer\Exclude()
      */
     private $createur;
 
@@ -60,6 +78,8 @@ class Trajet
     /**
      * @ORM\ManyToMany(targetEntity="User", cascade={"persist"})
      * @Assert\Valid()
+     *
+     * @Serializer\Exclude()
      */
     private $passagers;
 

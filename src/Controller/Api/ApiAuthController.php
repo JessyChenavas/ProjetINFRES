@@ -30,7 +30,6 @@ class ApiAuthController extends ApiController
         // Log de la request
         $this->log->info('REQUEST;/auth/Register;POST|',$data);
 
-        
         $em = $this->getDoctrine()->getManager();
 
         $user = new User();

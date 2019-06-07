@@ -5,9 +5,26 @@ namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Validator\Constraints as Assert;
+use Hateoas\Configuration\Annotation as Hateoas;
+use JMS\Serializer\Annotation as Serializer;
 
 /**
  * @ORM\Entity
+ *
+ * @Hateoas\Relation("self",
+ *      href = @Hateoas\Route("api_afficher_annonce", parameters = { "id" = "expr(object.getId())" }))
+
+ * @Hateoas\Relation("edit",
+ *      href = @Hateoas\Route("api_modifier_annonce", parameters = { "id" = "expr(object.getId())" }))
+ *
+ * @Hateoas\Relation("delete",
+ *      href = @Hateoas\Route("api_supprimer_annonce", parameters = { "id" = "expr(object.getId())" }))
+ *
+ *  @Hateoas\Relation("images", embedded = "expr(object.getImages())",
+ *   exclusion = @Hateoas\Exclusion(excludeIf = "expr(object.getImages() === null)"))
+ *
+ *  @Hateoas\Relation("createur", embedded = "expr(object.getCreateur())",
+ *   exclusion = @Hateoas\Exclusion(excludeIf = "expr(object.getCreateur() === null)"))
  */
 class Annonce
 {
@@ -22,6 +39,8 @@ class Annonce
      * @ORM\ManyToOne(targetEntity="User", cascade={"persist"}, fetch="EAGER")
      * @ORM\JoinColumn(nullable=false)
      * @Assert\Valid()
+     *
+     * @Serializer\Exclude()
      */
     private $createur;
 
@@ -40,6 +59,8 @@ class Annonce
     /**
      * @ORM\ManyToMany(targetEntity="Image", cascade={"persist"}, fetch="EAGER")
      * @Assert\Valid()
+     *
+     * @Serializer\Exclude()
      */
     private $images;
 

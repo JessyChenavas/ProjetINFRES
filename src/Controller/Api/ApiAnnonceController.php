@@ -31,7 +31,7 @@ class ApiAnnonceController extends ApiController
             throw new ResourceValidationException('Annonce non existante !');
         }
 
-        $data =  $this->get('serializer')->serialize($annonce, 'json', $this->serializer->serialize('annonce'));
+        $data = $this->serializer->serialize($annonce, 'json');
 
         return new Response($data);
     }
@@ -54,9 +54,7 @@ class ApiAnnonceController extends ApiController
         }
 
         $paginatedCollection = $this->paginator->paginate($annonces, $page, 10);
-        $serialization = $this->serializer->serialize('annonce', true);
-
-        $data =  $this->get('serializer')->serialize($paginatedCollection, 'json', $serialization);
+        $data = $this->serializer->serialize($paginatedCollection, 'json');
 
         return new Response($data);
     }
