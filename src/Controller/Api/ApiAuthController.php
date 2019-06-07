@@ -89,7 +89,7 @@ class ApiAuthController extends ApiController
             $response = json_decode($responsejson->getContent(), true);
 
             // Log de la response
-            $this->log->error('RESPONSE;/auth/Register;POST|',$response);
+            $this->log->error(sprintf('RESPONSE;%s;%s|', $request->getRequestUri(), $request->getMethod()),$response);
             return $responsejson;
         }
 
