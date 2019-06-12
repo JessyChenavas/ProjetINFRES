@@ -51,7 +51,8 @@ class ApiEvenementController extends ApiController
         $response = new Response($data);
 
         // Log de la response
-        $this->log->info(sprintf('RESPONSE;%s;%s|', $request->getRequestUri(), $request->getMethod()),$data);
+        $responsejson = json_decode($response->getContent(), true);
+        $this->log->info(sprintf('RESPONSE;%s;%s|', $request->getRequestUri(), $request->getMethod()),$responsejson);
         
         return $response;
     }
@@ -80,7 +81,8 @@ class ApiEvenementController extends ApiController
         $response = new Response($data);
 
         // Log de la response
-        $this->log->info(sprintf('RESPONSE;%s;%s|', $request->getRequestUri(), $request->getMethod()),$data);
+        $responsejson = json_decode($response->getContent(), true);
+        $this->log->info(sprintf('RESPONSE;%s;%s|', $request->getRequestUri(), $request->getMethod()),$responsejson);
         
         return $response;
     }
@@ -128,7 +130,8 @@ class ApiEvenementController extends ApiController
         $response = new Response($data);
 
         // Log de la response
-        $this->log->info(sprintf('RESPONSE;%s;%s|', $request->getRequestUri(), $request->getMethod()),$data);
+        $responsejson = json_decode($response->getContent(), true);
+        $this->log->info(sprintf('RESPONSE;%s;%s|', $request->getRequestUri(), $request->getMethod()),$responsejson);
         
         return $response;
     }
