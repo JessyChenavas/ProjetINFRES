@@ -29,14 +29,14 @@ class ApiSecurityController extends ApiController
         $data = json_decode($request->getContent(), true);
 
         // Log de la request
-        $this->log->info('REQUEST;/createClient;POST|',$data);
+        $this->log->info(sprintf('REQUEST;%s;%s|', $request->getRequestUri(), $request->getMethod()),$data);
 
         if (empty($data['redirect-uri']) || empty($data['grant-type'])) {
             $responsejson = new JsonResponse(['error' => 'Field(s) empty']);
             $response = json_decode($responsejson->getContent(), true);
 
             // Log de la response
-            $this->log->error('RESPONSE;/createClient;POST|',$response);
+            $this->log->error(sprintf('RESPONSE;%s;%s|', $request->getRequestUri(), $request->getMethod()),$response);
             return $responsejson;
         }
 
@@ -54,8 +54,7 @@ class ApiSecurityController extends ApiController
         $response = json_decode($responsejson->getContent(), true);
             
         // Log de la response
-        $this->log->info('RESPONSE;/createClient;POST|',$response);
-
+        $this->log->info(sprintf('RESPONSE;%s;%s|', $request->getRequestUri(), $request->getMethod()),$response);
         return $responsejson;
     }
 }

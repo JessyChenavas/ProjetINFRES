@@ -25,15 +25,27 @@ class ApiAnnonceController extends ApiController
      * @return Response
      * @throws ResourceValidationException
      */
-    public function afficherAnnonce(Annonce $annonce = null)
+    public function afficherAnnonce(Request $request, Annonce $annonce = null)
     {
+        // Log de la request
+        $this->log->info(sprintf('REQUEST;%s;%s|', $request->getRequestUri(), $request->getMethod()));
+        
         if (!$annonce) {
+            // Log de l'error
+            $responsejson = new JsonResponse(["error" => "Annonce non existante !"], 404);
+            $response = json_decode($responsejson->getContent(), true);
+            $this->log->error(sprintf('RESPONSE;%s;%s|', $request->getRequestUri(), $request->getMethod()),$response);
+            
             throw new ResourceValidationException('Annonce non existante !');
         }
 
         $data = $this->serializer->serialize($annonce, 'json');
+        $response = new Response($data);
 
-        return new Response($data);
+        // Log de la response
+        $this->log->info(sprintf('RESPONSE;%s;%s|', $request->getRequestUri(), $request->getMethod()),$data);
+        
+        return $response;
     }
 
     /**
@@ -43,20 +55,32 @@ class ApiAnnonceController extends ApiController
      * @return Response
      * @throws ResourceValidationException
      */
-    public function listeAnnonces($page)
+    public function listeAnnonces(Request $request, $page)
     {
+        // Log de la request
+        $this->log->info(sprintf('REQUEST;%s;%s|', $request->getRequestUri(), $request->getMethod()));
+
         $annonces = $this->getDoctrine()
             ->getRepository(Annonce::class)
             ->findAll();
 
         if (!$annonces) {
+            // Log de l'error
+            $responsejson = new JsonResponse(["error" => "'Aucune annonce trouvée !'"], 404);
+            $response = json_decode($responsejson->getContent(), true);
+            $this->log->error(sprintf('RESPONSE;%s;%s|', $request->getRequestUri(), $request->getMethod()),$response);
+            
             throw new ResourceValidationException('Aucune annonce trouvée !');
         }
 
         $paginatedCollection = $this->paginator->paginate($annonces, $page, 10);
         $data = $this->serializer->serialize($paginatedCollection, 'json');
+        $response = new Response($data);
 
-        return new Response($data);
+        // Log de la response
+        $this->log->info(sprintf('RESPONSE;%s;%s|', $request->getRequestUri(), $request->getMethod()),$data);
+        
+        return $response;
     }
 
     /**
@@ -67,6 +91,10 @@ class ApiAnnonceController extends ApiController
      *  @Security("is_granted('ROLE_USER')", statusCode=401, message="Vous devez être connecté pour effectuer cette action !")
      */
     public function creerAnnonce(Request $request, ValidatorInterface $validator) {
+
+        // Log de la request
+        $this->log->info(sprintf('REQUEST;%s;%s|', $request->getRequestUri(), $request->getMethod()));
+
         $annonce = new Annonce();
 
         $data = json_decode($request->getContent(), true);
@@ -88,13 +116,27 @@ class ApiAnnonceController extends ApiController
 
         $listErrors = $validator->validate($annonce);
         if(count($listErrors) > 0) {
-            return new JsonResponse(["error" => (string)$listErrors], 500);
+
+            // Log de l'error
+            $responsejson = new JsonResponse(["error" => (string)$listErrors], 500);
+            $response = json_decode($responsejson->getContent(), true);
+            $this->log->error(sprintf('RESPONSE;%s;%s|', $request->getRequestUri(), $request->getMethod()),$response);
+            
+            return $responsejson;
+
         }
 
         $em->persist($annonce);
         $em->flush();
 
-        return new JsonResponse(["success" => "L'annonce est enregistrée !"], 201);
+        $responsejson = new JsonResponse(["success" => "L'annonce est enregistrée !"], 201);
+        $response = json_decode($responsejson->getContent(), true);
+            
+        // Log de la response
+        $this->log->info(sprintf('RESPONSE;%s;%s|', $request->getRequestUri(), $request->getMethod()),$response);
+        
+        return $responsejson;
+
     }
 
     /**
@@ -107,7 +149,16 @@ class ApiAnnonceController extends ApiController
      * @throws ResourceValidationException
      */
     public function modifierAnnonce(Request $request, ValidatorInterface $validator, Annonce $annonce = null) {
+        
+        // Log de la request
+        $this->log->info(sprintf('REQUEST;%s;%s|', $request->getRequestUri(), $request->getMethod()));
+        
         if (!$annonce) {
+            // Log de l'error
+            $responsejson = new JsonResponse(["error" => "Annonce non existante !"], 404);
+            $response = json_decode($responsejson->getContent(), true);
+            $this->log->error(sprintf('RESPONSE;%s;%s|', $request->getRequestUri(), $request->getMethod()),$response);
+            
             throw new ResourceValidationException('Annonce non existante !');
         }
 
@@ -120,13 +171,26 @@ class ApiAnnonceController extends ApiController
 
         $listErrors = $validator->validate($annonce);
         if(count($listErrors) > 0) {
-            return new JsonResponse(["error" => (string)$listErrors], 500);
+
+            // Log de l'error
+            $responsejson = new JsonResponse(["error" => (string)$listErrors], 500);
+            $response = json_decode($responsejson->getContent(), true);
+            $this->log->error(sprintf('RESPONSE;%s;%s|', $request->getRequestUri(), $request->getMethod()),$response);
+            
+            return $responsejson;
+
         }
 
         $em->persist($annonce);
         $em->flush();
 
-        return new JsonResponse(["success" => "L'annonce a été modifiée !"], 200);
+        $responsejson = new JsonResponse(["success" => "L'annonce a été modifiée !"], 200);
+        $response = json_decode($responsejson->getContent(), true);
+            
+        // Log de la response
+        $this->log->info(sprintf('RESPONSE;%s;%s|', $request->getRequestUri(), $request->getMethod()),$response);
+        
+        return $responsejson;
     }
 
     /**
@@ -139,7 +203,16 @@ class ApiAnnonceController extends ApiController
      * @throws ResourceValidationException
      */
     public function ajouterImage(Request $request, ValidatorInterface $validator, Annonce $annonce = null) {
+        
+        // Log de la request
+        $this->log->info(sprintf('REQUEST;%s;%s|', $request->getRequestUri(), $request->getMethod()));
+
         if (!$annonce) {
+            // Log de l'error
+            $responsejson = new JsonResponse(["error" => "Annonce non existante !"], 404);
+            $response = json_decode($responsejson->getContent(), true);
+            $this->log->error(sprintf('RESPONSE;%s;%s|', $request->getRequestUri(), $request->getMethod()),$response);
+            
             throw new ResourceValidationException('Annonce non existante !');
         }
 
@@ -161,13 +234,26 @@ class ApiAnnonceController extends ApiController
 
         $listErrors = $validator->validate($annonce);
         if(count($listErrors) > 0) {
-            return new JsonResponse(["error" => (string)$listErrors], 500);
+
+            // Log de l'error
+            $responsejson = new JsonResponse(["error" => (string)$listErrors], 500);
+            $response = json_decode($responsejson->getContent(), true);
+            $this->log->error(sprintf('RESPONSE;%s;%s|', $request->getRequestUri(), $request->getMethod()),$response);
+            
+            return $responsejson;
+
         }
 
         $em->persist($annonce);
         $em->flush();
 
-        return new JsonResponse(["success" => sprintf("L'image %s a été ajoutée ! ", $image->getAlt())], 200);
+        $responsejson = new JsonResponse(["success" => sprintf("L'image %s a été ajoutée ! ", $image->getAlt())], 200);
+        $response = json_decode($responsejson->getContent(), true);
+            
+        // Log de la response
+        $this->log->info(sprintf('RESPONSE;%s;%s|', $request->getRequestUri(), $request->getMethod()),$response);
+        
+        return $responsejson;
     }
 
     /**
@@ -182,12 +268,26 @@ class ApiAnnonceController extends ApiController
      * @Security("annonce.estCreateur(user) or is_granted('ROLE_ADMIN')", statusCode=403, message="Seul le créateur de l'annonce peut effectuer cette action !"))
      * @throws ResourceValidationException
      */
-    public function supprimerImage(Image $image = null, Annonce $annonce = null) {
+    public function supprimerImage(Request $request, Image $image = null, Annonce $annonce = null) {
+        
+        // Log de la request
+        $this->log->info(sprintf('REQUEST;%s;%s|', $request->getRequestUri(), $request->getMethod()));
+        
         if (!$annonce) {
+            // Log de l'error
+            $responsejson = new JsonResponse(["error" => "Annonce non existante !"], 404);
+            $response = json_decode($responsejson->getContent(), true);
+            $this->log->error(sprintf('RESPONSE;%s;%s|', $request->getRequestUri(), $request->getMethod()),$response);
+            
             throw new ResourceValidationException('Annonce non existante !');
         }
 
         if (!$image) {
+            // Log de l'error
+            $responsejson = new JsonResponse(["error" => "Image non existante !"], 404);
+            $response = json_decode($responsejson->getContent(), true);
+            $this->log->error(sprintf('RESPONSE;%s;%s|', $request->getRequestUri(), $request->getMethod()),$response);
+            
             throw new ResourceValidationException('Image non existante !');
         }
 
@@ -195,8 +295,15 @@ class ApiAnnonceController extends ApiController
         $annonce->removeImage($image);
         $em->persist($annonce);
         $em->flush();
+    
+        $responsejson = new JsonResponse(["success" => sprintf("L'image %s a été enlevée !", $image->getAlt())], 200);
 
-        return new JsonResponse(["success" => sprintf("L'image %s a été enlevée !", $image->getAlt())], 200);
+        $response = json_decode($responsejson->getContent(), true);
+            
+        // Log de la response
+        $this->log->info(sprintf('RESPONSE;%s;%s|', $request->getRequestUri(), $request->getMethod()),$response);
+        
+        return $responsejson;
     }
 
     /**
@@ -208,8 +315,17 @@ class ApiAnnonceController extends ApiController
      * @Security("annonce.estCreateur(user) or is_granted('ROLE_ADMIN')", statusCode=403, message="Seul le créateur de l'annonce peut effectuer cette action !"))
      * @throws ResourceValidationException
      */
-    public function supprimerAnnonce(Annonce $annonce) {
+    public function supprimerAnnonce(Request $request, Annonce $annonce) {
+        
+        // Log de la request
+        $this->log->info(sprintf('REQUEST;%s;%s|', $request->getRequestUri(), $request->getMethod()));
+        
         if (!$annonce) {
+            // Log de l'error
+            $responsejson = new JsonResponse(["error" => "Annonce non existante !"], 404);
+            $response = json_decode($responsejson->getContent(), true);
+            $this->log->error(sprintf('RESPONSE;%s;%s|', $request->getRequestUri(), $request->getMethod()),$response);
+            
             throw new ResourceValidationException('Annonce non existante !');
         }
 
@@ -217,6 +333,12 @@ class ApiAnnonceController extends ApiController
         $em->remove($annonce);
         $em->flush();
 
-        return new JsonResponse(["success" => "L'annonce a été supprimée !"], 200);
+        $responsejson = new JsonResponse(["success" => "L'annonce a été supprimée !"], 200);
+        $response = json_decode($responsejson->getContent(), true);
+            
+        // Log de la response
+        $this->log->info(sprintf('RESPONSE;%s;%s|', $request->getRequestUri(), $request->getMethod()),$response);
+        
+        return $responsejson;
     }
 }

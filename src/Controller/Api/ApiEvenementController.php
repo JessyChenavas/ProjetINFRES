@@ -27,20 +27,33 @@ class ApiEvenementController extends ApiController
      * @return Response
      * @throws ResourceValidationException
      */
-    public function listeEvenements($page)
+    public function listeEvenements(Request $request, $page)
     {
+        // Log de la request
+        $this->log->info(sprintf('REQUEST;%s;%s|', $request->getRequestUri(), $request->getMethod()));
+        
         $events = $this->getDoctrine()
             ->getRepository(Evenement::class)
             ->findAll();
 
         if (!$events) {
+            // Log de l'error
+            $responsejson = new JsonResponse(["error" => "Aucun évènement trouvé !"], 404);
+            $response = json_decode($responsejson->getContent(), true);
+            $this->log->error(sprintf('RESPONSE;%s;%s|', $request->getRequestUri(), $request->getMethod()),$response);
+            
             throw new ResourceValidationException('Aucun évènement trouvé !');
         }
 
         $paginatedCollection = $this->paginator->paginate($events, $page, 5);
         $data = $this->serializer->serialize($paginatedCollection, 'json');
 
-        return new Response($data);
+        $response = new Response($data);
+
+        // Log de la response
+        $this->log->info(sprintf('RESPONSE;%s;%s|', $request->getRequestUri(), $request->getMethod()),$data);
+        
+        return $response;
     }
 
     /**
@@ -49,15 +62,27 @@ class ApiEvenementController extends ApiController
      * @return Response
      * @throws ResourceValidationException
      */
-    public function afficherEvenement(Evenement $event = null)
+    public function afficherEvenement(Request $request, Evenement $event = null)
     {
+        // Log de la request
+        $this->log->info(sprintf('REQUEST;%s;%s|', $request->getRequestUri(), $request->getMethod()));
+        
         if (!$event) {
+            // Log de l'error
+            $responsejson = new JsonResponse(["error" => "Évènement non existant !"], 404);
+            $response = json_decode($responsejson->getContent(), true);
+            $this->log->error(sprintf('RESPONSE;%s;%s|', $request->getRequestUri(), $request->getMethod()),$response);
+            
             throw new ResourceValidationException('Évènement non existant !');
         }
 
         $data = $this->serializer->serialize($event, 'json');
+        $response = new Response($data);
 
-        return new Response($data);
+        // Log de la response
+        $this->log->info(sprintf('RESPONSE;%s;%s|', $request->getRequestUri(), $request->getMethod()),$data);
+        
+        return $response;
     }
 
     /**
@@ -71,8 +96,16 @@ class ApiEvenementController extends ApiController
      *
      * @throws ResourceValidationException
      */
-    public function afficherAgendaUtilisateur ($page, User $user = null) {
+    public function afficherAgendaUtilisateur (Request $request, $page, User $user = null) {
+        // Log de la request
+        $this->log->info(sprintf('REQUEST;%s;%s|', $request->getRequestUri(), $request->getMethod()));
+        
         if (!$user) {
+            // Log de l'error
+            $responsejson = new JsonResponse(["error" => "Utilisateur non existant !"], 404);
+            $response = json_decode($responsejson->getContent(), true);
+            $this->log->error(sprintf('RESPONSE;%s;%s|', $request->getRequestUri(), $request->getMethod()),$response);
+            
             throw new ResourceValidationException('Utilisateur non existant !');
         }
 
@@ -81,14 +114,23 @@ class ApiEvenementController extends ApiController
             ->findEventByUser($user);
 
         if (!$events) {
+            // Log de l'error
+            $responsejson = new JsonResponse(["error" => "Aucun évènement trouvé !"], 404);
+            $response = json_decode($responsejson->getContent(), true);
+            $this->log->error(sprintf('RESPONSE;%s;%s|', $request->getRequestUri(), $request->getMethod()),$response);
+            
             throw new ResourceValidationException('Aucun évènement trouvé !');
         }
 
         $paginatedCollection = $this->paginator->paginate($events, $page, 5);
 
         $data = $this->serializer->serialize($paginatedCollection, 'json');
+        $response = new Response($data);
 
-        return new Response($data);
+        // Log de la response
+        $this->log->info(sprintf('RESPONSE;%s;%s|', $request->getRequestUri(), $request->getMethod()),$data);
+        
+        return $response;
     }
 
     /**
@@ -100,6 +142,9 @@ class ApiEvenementController extends ApiController
      */
     public function creerEvenement(Request $request)
     {
+        // Log de la request
+        $this->log->info(sprintf('REQUEST;%s;%s|', $request->getRequestUri(), $request->getMethod()));
+        
         $em = $this->getDoctrine()->getManager();
         $event = new Evenement();
         $form = $this->createForm(EvenementType::class, $event);
@@ -126,10 +171,23 @@ class ApiEvenementController extends ApiController
 
             $em->persist($event);
             $em->flush();
-            return new JsonResponse(['success' => sprintf('L\'évènement %s a bien été ajouté !', $data['titre'])], 201);
+
+            $responsejson = new JsonResponse(['success' => sprintf('L\'évènement %s a bien été ajouté !', $data['titre'])], 201);
+            $response = json_decode($responsejson->getContent(), true);
+            
+            // Log de la response
+            $this->log->info(sprintf('RESPONSE;%s;%s|', $request->getRequestUri(), $request->getMethod()),$response);
+            return $responsejson;
+
         }
 
-        return new JsonResponse(['error' => $form->getErrors(true, false)->__toString()], 500);
+        $responsejson = new JsonResponse(['error' => $form->getErrors(true, false)->__toString()], 500);
+        $response = json_decode($responsejson->getContent(), true);
+        
+        // Log de la response
+        $this->log->error(sprintf('RESPONSE;%s;%s|', $request->getRequestUri(), $request->getMethod()),$response);
+        return $responsejson;
+
     }
 
     /**
@@ -143,7 +201,15 @@ class ApiEvenementController extends ApiController
      */
     public function modifierEvenement(Request $request, Evenement $event = null)
     {
+        // Log de la request
+        $this->log->info(sprintf('REQUEST;%s;%s|', $request->getRequestUri(), $request->getMethod()));
+        
         if (!$event) {
+            // Log de l'error
+            $responsejson = new JsonResponse(["error" => "Évènement non existant !"], 404);
+            $response = json_decode($responsejson->getContent(), true);
+            $this->log->error(sprintf('RESPONSE;%s;%s|', $request->getRequestUri(), $request->getMethod()),$response);
+            
             throw new ResourceValidationException('Évènement non existant !');
         }
 
@@ -170,10 +236,21 @@ class ApiEvenementController extends ApiController
 
             $em->persist($event);
             $em->flush();
-            return new JsonResponse(['success' => sprintf('L\'évènement %s a bien été modifié !', $data['titre'])], 200);
+
+            $responsejson = new JsonResponse(['success' => sprintf('L\'évènement %s a bien été modifié !', $data['titre'])], 200);
+            $response = json_decode($responsejson->getContent(), true);
+            
+            // Log de la response
+            $this->log->info(sprintf('RESPONSE;%s;%s|', $request->getRequestUri(), $request->getMethod()),$response);
+            return $responsejson;
         }
 
-        return new JsonResponse(['error' => $form->getErrors(true, false)->__toString()], 500);
+        $responsejson = new JsonResponse(['error' => $form->getErrors(true, false)->__toString()], 500);
+        $response = json_decode($responsejson->getContent(), true);
+                    
+            // Log de la response
+            $this->log->error(sprintf('RESPONSE;%s;%s|', $request->getRequestUri(), $request->getMethod()),$response);
+            return $responsejson;
     }
 
     /**
@@ -186,8 +263,16 @@ class ApiEvenementController extends ApiController
      *
      * @throws ResourceValidationException
      */
-    public function supprimerEvenement(Evenement $event = null) {
+    public function supprimerEvenement(Request $request, Evenement $event = null) {
+        // Log de la request
+        $this->log->info(sprintf('REQUEST;%s;%s|', $request->getRequestUri(), $request->getMethod()));
+        
         if (!$event) {
+            // Log de l'error
+            $responsejson = new JsonResponse(["error" => "Évènement non existant !"], 404);
+            $response = json_decode($responsejson->getContent(), true);
+            $this->log->error(sprintf('RESPONSE;%s;%s|', $request->getRequestUri(), $request->getMethod()),$response);
+            
             throw new ResourceValidationException('Évènement non existant !');
         }
 
@@ -195,7 +280,12 @@ class ApiEvenementController extends ApiController
         $em->remove($event);
         $em->flush();
 
-        return new JsonResponse(["success" => "L'évènement a été supprimé !"], 200);
+        $responsejson = new JsonResponse(["success" => "L'évènement a été supprimé !"], 200);
+        $response = json_decode($responsejson->getContent(), true);
+            
+        // Log de la response
+        $this->log->info(sprintf('RESPONSE;%s;%s|', $request->getRequestUri(), $request->getMethod()),$response);
+        return $responsejson;
     }
 
     /** @Route("/events/{id}/join", name="rejoindre_evenement")
@@ -206,24 +296,42 @@ class ApiEvenementController extends ApiController
      *
      * @throws ResourceValidationException
      */
-    public function rejoindreEvenement(Evenement $event = null) {
+    public function rejoindreEvenement(Request $request, Evenement $event = null) {
+        // Log de la request
+        $this->log->info(sprintf('REQUEST;%s;%s|', $request->getRequestUri(), $request->getMethod()));
+        
         if (!$event) {
+            // Log de l'error
+            $responsejson = new JsonResponse(["error" => "Évènement non existant !"], 404);
+            $response = json_decode($responsejson->getContent(), true);
+            $this->log->error(sprintf('RESPONSE;%s;%s|', $request->getRequestUri(), $request->getMethod()),$response);
+            
             throw new ResourceValidationException('Évènement non existant !');
         }
 
         if (!$event->addParticipant($this->getUser())) {
-            return new JsonResponse(
+            $responsejson = new JsonResponse(
                 ["error" => "L'ajout n'a pas été effectué : l'évènement est plein ou l'utilisateur est déjà inscrit."],
                 409);
+            $response = json_decode($responsejson->getContent(), true);
+                    
+            // Log de la response
+            $this->log->error(sprintf('RESPONSE;%s;%s|', $request->getRequestUri(), $request->getMethod()),$response);
+            return $responsejson;
         }
 
         $em = $this->getDoctrine()->getManager();
         $em->persist($event);
         $em->flush();
 
-        return new JsonResponse(
+        $responsejson = new JsonResponse(
             ["success" => sprintf("Vous avez rejoint l'évènement %s !", $event->getTitre())],
             200);
+            $response = json_decode($responsejson->getContent(), true);
+                    
+            // Log de la response
+            $this->log->info(sprintf('RESPONSE;%s;%s|', $request->getRequestUri(), $request->getMethod()),$response);
+            return $responsejson;
     }
 
     /** @Route("/events/{id}/leave", name="quitter_evenement")
@@ -234,8 +342,16 @@ class ApiEvenementController extends ApiController
      *
      * @throws ResourceValidationException
      */
-    public function quitterEvenement(Evenement $event = null) {
+    public function quitterEvenement(Request $request, Evenement $event = null) {
+        // Log de la request
+        $this->log->info(sprintf('REQUEST;%s;%s|', $request->getRequestUri(), $request->getMethod()));
+        
         if (!$event) {
+            // Log de l'error
+            $responsejson = new JsonResponse(["error" => "Évènement non existant !"], 404);
+            $response = json_decode($responsejson->getContent(), true);
+            $this->log->error(sprintf('RESPONSE;%s;%s|', $request->getRequestUri(), $request->getMethod()),$response);
+            
             throw new ResourceValidationException('Évènement non existant !');
         }
 
@@ -245,8 +361,13 @@ class ApiEvenementController extends ApiController
         $em->persist($event);
         $em->flush();
 
-        return new JsonResponse(
+        $responsejson = new JsonResponse(
             ["success" => sprintf("Vous avez quitté l'évènement %s !", $event->getTitre())],
             200);
+            $response = json_decode($responsejson->getContent(), true);
+                    
+            // Log de la response
+            $this->log->info(sprintf('RESPONSE;%s;%s|', $request->getRequestUri(), $request->getMethod()),$response);
+            return $responsejson;
     }
 }

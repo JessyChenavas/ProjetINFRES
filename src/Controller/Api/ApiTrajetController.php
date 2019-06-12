@@ -25,15 +25,28 @@ class ApiTrajetController extends ApiController
      * @return Response
      * @throws ResourceValidationException
      */
-    public function afficherTrajet(Trajet $trajet = null)
+    public function afficherTrajet(Request $request, Trajet $trajet = null)
     {
+        // Log de la request
+        $this->log->info(sprintf('REQUEST;%s;%s|', $request->getRequestUri(), $request->getMethod()));
+        
         if (!$trajet) {
+            // Log de l'error
+            $responsejson = new JsonResponse(["error" => "Trajet non existant !"], 404);
+            $response = json_decode($responsejson->getContent(), true);
+            $this->log->error(sprintf('RESPONSE;%s;%s|', $request->getRequestUri(), $request->getMethod()),$response);
+            
             throw new ResourceValidationException('Trajet non existant !');
         }
 
         $data = $this->serializer->serialize($trajet, 'json');
 
-        return new Response($data);
+        $response = new Response($data);
+
+        // Log de la response
+        $this->log->info(sprintf('RESPONSE;%s;%s|', $request->getRequestUri(), $request->getMethod()),$data);
+        
+        return $response;
     }
 
     /**
@@ -43,8 +56,16 @@ class ApiTrajetController extends ApiController
      * @return Response
      * @throws ResourceValidationException
      */
-    public function afficherTrajetParUtilisateur($page, User $user = null) {
+    public function afficherTrajetParUtilisateur(Request $request, $page, User $user = null) {
+        // Log de la request
+        $this->log->info(sprintf('REQUEST;%s;%s|', $request->getRequestUri(), $request->getMethod()));
+        
         if (!$user) {
+            // Log de l'error
+            $responsejson = new JsonResponse(["error" => "Utilisateur non existant !"], 404);
+            $response = json_decode($responsejson->getContent(), true);
+            $this->log->error(sprintf('RESPONSE;%s;%s|', $request->getRequestUri(), $request->getMethod()),$response);
+            
             throw new ResourceValidationException('Utilisateur non existant !');
         }
 
@@ -52,14 +73,24 @@ class ApiTrajetController extends ApiController
             ->getRepository(Trajet::class)
             ->findBy(['createur' => $user]);
 
-        if (!$trajets) {
-            throw new ResourceValidationException('Aucun trajet trouvé !');
-        }
+            if (!$trajets) {
+                // Log de l'error
+                $responsejson = new JsonResponse(["error" => "Aucun trajet trouvé !"], 404);
+                $response = json_decode($responsejson->getContent(), true);
+                $this->log->error(sprintf('RESPONSE;%s;%s|', $request->getRequestUri(), $request->getMethod()),$response);
+                
+                throw new ResourceValidationException('Aucun trajet trouvé !');
+            }
 
         $paginatedCollection = $this->paginator->paginate($trajets, $page, 10);
         $data = $this->serializer->serialize($paginatedCollection, 'json');
 
-        return new Response($data);
+        $response = new Response($data);
+
+        // Log de la response
+        $this->log->info(sprintf('RESPONSE;%s;%s|', $request->getRequestUri(), $request->getMethod()),$data);
+        
+        return $response;
     }
 
     /**
@@ -69,19 +100,32 @@ class ApiTrajetController extends ApiController
      * @return Response
      * @throws ResourceValidationException
      */
-    public function afficherTrajetParLieuDepartArrive(string $depart, string $arrive, $page) {
+    public function afficherTrajetParLieuDepartArrive(Request $request, string $depart, string $arrive, $page) {
+        // Log de la request
+        $this->log->info(sprintf('REQUEST;%s;%s|', $request->getRequestUri(), $request->getMethod()));
+        
         $trajets = $this->getDoctrine()
             ->getRepository(Trajet::class)
             ->findBy(['lieuDepart' => $depart, 'lieuArrive' => $arrive]);
 
         if (!$trajets) {
+            // Log de l'error
+            $responsejson = new JsonResponse(["error" => "Aucun trajet trouvé !"], 404);
+            $response = json_decode($responsejson->getContent(), true);
+            $this->log->error(sprintf('RESPONSE;%s;%s|', $request->getRequestUri(), $request->getMethod()),$response);
+            
             throw new ResourceValidationException('Aucun trajet trouvé !');
         }
 
         $paginatedCollection = $this->paginator->paginate($trajets, $page, 10);
         $data = $this->serializer->serialize($paginatedCollection, 'json');
 
-        return new Response($data);
+        $response = new Response($data);
+
+        // Log de la response
+        $this->log->info(sprintf('RESPONSE;%s;%s|', $request->getRequestUri(), $request->getMethod()),$data);
+        
+        return $response;
     }
 
     /**
@@ -89,20 +133,33 @@ class ApiTrajetController extends ApiController
      * @Rest\Get("/trajets/page{page}", name="liste_trajets_pagine")
      * @throws ResourceValidationException
      */
-    public function listeTrajets($page)
+    public function listeTrajets(Request $request, $page)
     {
+        // Log de la request
+        $this->log->info(sprintf('REQUEST;%s;%s|', $request->getRequestUri(), $request->getMethod()));
+        
         $trajets = $this->getDoctrine()
             ->getRepository(Trajet::class)
             ->findAll();
 
-        if (!$trajets) {
-            throw new ResourceValidationException('Aucun trajet trouvé !');
-        }
+            if (!$trajets) {
+                // Log de l'error
+                $responsejson = new JsonResponse(["error" => "Aucun trajet trouvé !"], 404);
+                $response = json_decode($responsejson->getContent(), true);
+                $this->log->error(sprintf('RESPONSE;%s;%s|', $request->getRequestUri(), $request->getMethod()),$response);
+                
+                throw new ResourceValidationException('Aucun trajet trouvé !');
+            }
 
         $paginatedCollection = $this->paginator->paginate($trajets, $page, 10);
         $data = $this->serializer->serialize($paginatedCollection, 'json');
 
-        return new Response($data);
+        $response = new Response($data);
+
+        // Log de la response
+        $this->log->info(sprintf('RESPONSE;%s;%s|', $request->getRequestUri(), $request->getMethod()),$data);
+        
+        return $response;
     }
 
     /**
@@ -114,6 +171,9 @@ class ApiTrajetController extends ApiController
      */
     public function creerTrajet(Request $request, ValidatorInterface $validator)
     {
+        // Log de la request
+        $this->log->info(sprintf('REQUEST;%s;%s|', $request->getRequestUri(), $request->getMethod()));
+        
         $trajet = new Trajet();
 
         $data = json_decode($request->getContent(), true);
@@ -131,14 +191,24 @@ class ApiTrajetController extends ApiController
 
         $listErrors = $validator->validate($trajet);
         if(count($listErrors) > 0) {
-            return new JsonResponse(["error" => (string)$listErrors], 500);
+            $responsejson = new JsonResponse(["error" => (string)$listErrors], 500);
+            $response = json_decode($responsejson->getContent(), true);
+
+            // Log de la response
+            $this->log->error(sprintf('RESPONSE;%s;%s|', $request->getRequestUri(), $request->getMethod()),$response);
+            return $responsejson;
         }
 
         $em = $this->getDoctrine()->getManager();
         $em->persist($trajet);
         $em->flush();
 
-        return new JsonResponse(["success" => "Le trajet est enregistré !"], 201);
+        $responsejson = new JsonResponse(["success" => "Le trajet est enregistré !"], 201);
+        $response = json_decode($responsejson->getContent(), true);
+            
+        // Log de la response
+        $this->log->info(sprintf('RESPONSE;%s;%s|', $request->getRequestUri(), $request->getMethod()),$response);
+        return $responsejson;
     }
 
     /**
@@ -152,7 +222,15 @@ class ApiTrajetController extends ApiController
      */
     public function modifierTrajet(Request $request, ValidatorInterface $validator, Trajet $trajet = null)
     {
+        // Log de la request
+        $this->log->info(sprintf('REQUEST;%s;%s|', $request->getRequestUri(), $request->getMethod()));
+        
         if (!$trajet) {
+            // Log de l'error
+            $responsejson = new JsonResponse(["error" => "Trajet non existant !"], 404);
+            $response = json_decode($responsejson->getContent(), true);
+            $this->log->error(sprintf('RESPONSE;%s;%s|', $request->getRequestUri(), $request->getMethod()),$response);
+            
             throw new ResourceValidationException('Trajet non existant !');
         }
 
@@ -166,14 +244,24 @@ class ApiTrajetController extends ApiController
 
         $listErrors = $validator->validate($trajet);
         if(count($listErrors) > 0) {
-            return new JsonResponse(["error" => (string)$listErrors], 500);
+            $responsejson = new JsonResponse(["error" => (string)$listErrors], 500);
+            $response = json_decode($responsejson->getContent(), true);
+
+            // Log de la response
+            $this->log->error(sprintf('RESPONSE;%s;%s|', $request->getRequestUri(), $request->getMethod()),$response);
+            return $responsejson;
         }
 
         $em = $this->getDoctrine()->getManager();
         $em->persist($trajet);
         $em->flush();
 
-        return new JsonResponse(["success" => "Le trajet a été modifié !"], 200);
+        $responsejson = new JsonResponse(["success" => "Le trajet a été modifié !"], 200);
+        $response = json_decode($responsejson->getContent(), true);
+            
+        // Log de la response
+        $this->log->info(sprintf('RESPONSE;%s;%s|', $request->getRequestUri(), $request->getMethod()),$response);
+        return $responsejson;
     }
 
     /**
@@ -185,8 +273,16 @@ class ApiTrajetController extends ApiController
      * @Security("trajet.estCreateur(user) or is_granted('ROLE_ADMIN')", statusCode=403, message="Seul le créateur du trajet peut effectuer cette action !")
      * @throws ResourceValidationException
      */
-    public function supprimerTrajet(Trajet $trajet = null) {
+    public function supprimerTrajet(Request $request, Trajet $trajet = null) {
+        // Log de la request
+        $this->log->info(sprintf('REQUEST;%s;%s|', $request->getRequestUri(), $request->getMethod()));
+        
         if (!$trajet) {
+            // Log de l'error
+            $responsejson = new JsonResponse(["error" => "Trajet non existant !"], 404);
+            $response = json_decode($responsejson->getContent(), true);
+            $this->log->error(sprintf('RESPONSE;%s;%s|', $request->getRequestUri(), $request->getMethod()),$response);
+            
             throw new ResourceValidationException('Trajet non existant !');
         }
 
@@ -194,7 +290,12 @@ class ApiTrajetController extends ApiController
         $em->remove($trajet);
         $em->flush();
 
-        return new JsonResponse(["success" => "Le trajet a été supprimé !"], 200);
+        $responsejson = new JsonResponse(["success" => "Le trajet a été supprimé !"], 200);
+        $response = json_decode($responsejson->getContent(), true);
+            
+        // Log de la response
+        $this->log->info(sprintf('RESPONSE;%s;%s|', $request->getRequestUri(), $request->getMethod()),$response);
+        return $responsejson;
     }
 
     /**
@@ -209,34 +310,62 @@ class ApiTrajetController extends ApiController
      * @Security("trajet.estCreateur(user) or is_granted('ROLE_ADMIN')", statusCode=403, message="Seul le créateur du trajet peut effectuer cette action !")
      * @throws ResourceValidationException
      */
-    public function ajouterPassager(Trajet $trajet = null, User $user = null) {
+    public function ajouterPassager(Request $request, Trajet $trajet = null, User $user = null) {
+        // Log de la request
+        $this->log->info(sprintf('REQUEST;%s;%s|', $request->getRequestUri(), $request->getMethod()));
+        
         if (!$trajet) {
+            // Log de l'error
+            $responsejson = new JsonResponse(["error" => "Trajet non existant !"], 404);
+            $response = json_decode($responsejson->getContent(), true);
+            $this->log->error(sprintf('RESPONSE;%s;%s|', $request->getRequestUri(), $request->getMethod()),$response);
+            
             throw new ResourceValidationException('Trajet non existant !');
         }
 
         if (!$user) {
+            // Log de l'error
+            $responsejson = new JsonResponse(["error" => "Utilisateur non existant !"], 404);
+            $response = json_decode($responsejson->getContent(), true);
+            $this->log->error(sprintf('RESPONSE;%s;%s|', $request->getRequestUri(), $request->getMethod()),$response);
+            
             throw new ResourceValidationException('Utilisateur non existant !');
         }
 
         if($trajet->getCreateur()->getId() == $user->getId()) {
-            return new JsonResponse(
+            $responsejson = new JsonResponse(
                 ["error" => "L'ajout n'a pas été effectué : le créateur ne peut pas être passagé."],
                 409);
+            $response = json_decode($responsejson->getContent(), true);
+                    
+            // Log de la response
+            $this->log->error(sprintf('RESPONSE;%s;%s|', $request->getRequestUri(), $request->getMethod()),$response);
+            return $responsejson;
         }
 
         if (!$trajet->addPassager($user)) {
-            return new JsonResponse(
+            $responsejson = new JsonResponse(
                 ["error" => "L'ajout n'a pas été effectué : le trajet est complet ou le passager est déjà inscrit."],
                 409);
+                $response = json_decode($responsejson->getContent(), true);
+                    
+                // Log de la response
+                $this->log->error(sprintf('RESPONSE;%s;%s|', $request->getRequestUri(), $request->getMethod()),$response);
+                return $responsejson;
         }
 
         $em = $this->getDoctrine()->getManager();
         $em->persist($trajet);
         $em->flush();
 
-        return new JsonResponse(
+        $responsejson = new JsonResponse(
             ["success" => sprintf("Le passager %s a été ajouté au trajet de %s ! ", $user->getUsername(), $trajet->getCreateur()->getUsername())],
             201);
+            $response = json_decode($responsejson->getContent(), true);
+            
+            // Log de la response
+            $this->log->info(sprintf('RESPONSE;%s;%s|', $request->getRequestUri(), $request->getMethod()),$response);
+            return $responsejson;
     }
 
     /**
@@ -251,12 +380,25 @@ class ApiTrajetController extends ApiController
      * @Security("trajet.estCreateur(user) or is_granted('ROLE_ADMIN')", statusCode=403, message="Seul le créateur du trajet peut effectuer cette action !")
      * @throws ResourceValidationException
      */
-    public function supprimerPassager(Trajet $trajet = null, User $user = null) {
+    public function supprimerPassager(Request $request, Trajet $trajet = null, User $user = null) {
+        // Log de la request
+        $this->log->info(sprintf('REQUEST;%s;%s|', $request->getRequestUri(), $request->getMethod()));
+        
         if (!$trajet) {
+            // Log de l'error
+            $responsejson = new JsonResponse(["error" => "Trajet non existant !"], 404);
+            $response = json_decode($responsejson->getContent(), true);
+            $this->log->error(sprintf('RESPONSE;%s;%s|', $request->getRequestUri(), $request->getMethod()),$response);
+            
             throw new ResourceValidationException('Trajet non existant !');
         }
 
         if (!$user) {
+            // Log de l'error
+            $responsejson = new JsonResponse(["error" => "Utilisateur non existant !"], 404);
+            $response = json_decode($responsejson->getContent(), true);
+            $this->log->error(sprintf('RESPONSE;%s;%s|', $request->getRequestUri(), $request->getMethod()),$response);
+            
             throw new ResourceValidationException('Utilisateur non existant !');
         }
 
@@ -274,6 +416,10 @@ class ApiTrajetController extends ApiController
         $em->persist($trajet);
         $em->flush();
 
+        $response = json_decode($json_response->getContent(), true);
+            
+        // Log de la response
+        $this->log->info(sprintf('RESPONSE;%s;%s|', $request->getRequestUri(), $request->getMethod()),$response);
         return $json_response;
     }
 }

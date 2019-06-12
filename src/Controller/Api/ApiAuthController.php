@@ -28,7 +28,7 @@ class ApiAuthController extends ApiController
         $data = json_decode($request->getContent(), true);
 
         // Log de la request
-        $this->log->info('REQUEST;/auth/Register;POST|',$data);
+        $this->log->info(sprintf('REQUEST;%s;%s|', $request->getRequestUri(), $request->getMethod()),$data);
 
         $em = $this->getDoctrine()->getManager();
 
@@ -75,7 +75,7 @@ class ApiAuthController extends ApiController
             $response = json_decode($responsejson->getContent(), true);
 
             // Log de la response
-            $this->log->error('RESPONSE;/auth/Register;POST|',$response);
+            $this->log->error(sprintf('RESPONSE;%s;%s|', $request->getRequestUri(), $request->getMethod()),$response);
             return $responsejson;
         }
 
@@ -96,7 +96,7 @@ class ApiAuthController extends ApiController
         $response = json_decode($responsejson->getContent(), true);
             
         // Log de la response
-        $this->log->info('RESPONSE;/auth/Register;POST|',$response);
+        $this->log->info(sprintf('RESPONSE;%s;%s|', $request->getRequestUri(), $request->getMethod()),$response);
         return $responsejson;
         
     }

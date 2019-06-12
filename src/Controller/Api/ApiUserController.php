@@ -28,15 +28,28 @@ class ApiUserController extends ApiController
      * @return Response
      * @throws ResourceValidationException
      */
-    public function afficherUtilisateur(User $user = null)
+    public function afficherUtilisateur(Request $request, User $user = null)
     {
+        // Log de la request
+        $this->log->info(sprintf('REQUEST;%s;%s|', $request->getRequestUri(), $request->getMethod()));
+        
         if (!$user) {
+            // Log de l'error
+            $responsejson = new JsonResponse(["error" => "Utilisateur non existant !"], 404);
+            $response = json_decode($responsejson->getContent(), true);
+            $this->log->error(sprintf('RESPONSE;%s;%s|', $request->getRequestUri(), $request->getMethod()),$response);
+            
             throw new ResourceValidationException('Utilisateur non existant !');
         }
 
         $data = $this->serializer->serialize($user, 'json');
 
-        return new Response($data);
+        $response = new Response($data);
+
+        // Log de la response
+        $this->log->info(sprintf('RESPONSE;%s;%s|', $request->getRequestUri(), $request->getMethod()),$data);
+        
+        return $response;
     }
 
     /**
@@ -46,20 +59,33 @@ class ApiUserController extends ApiController
      * @return Response
      * @throws ResourceValidationException
      */
-    public function listeUtilisateurs($page)
+    public function listeUtilisateurs(Request $request, $page)
     {
+        // Log de la request
+        $this->log->info(sprintf('REQUEST;%s;%s|', $request->getRequestUri(), $request->getMethod()));
+        
         $users = $this->getDoctrine()
             ->getRepository(User::class)
             ->findAll();
 
         if (!$users) {
+            // Log de l'error
+            $responsejson = new JsonResponse(["error" => "Aucun utilisateur trouvé !"], 404);
+            $response = json_decode($responsejson->getContent(), true);
+            $this->log->error(sprintf('RESPONSE;%s;%s|', $request->getRequestUri(), $request->getMethod()),$response);
+            
             throw new ResourceValidationException('Aucun utilisateur trouvé !');
         }
 
         $paginatedCollection = $this->paginator->paginate($users, $page, 5);
         $data = $this->serializer->serialize($paginatedCollection, 'json');
 
-        return new Response($data);
+        $response = new Response($data);
+
+        // Log de la response
+        $this->log->info(sprintf('RESPONSE;%s;%s|', $request->getRequestUri(), $request->getMethod()),$data);
+        
+        return $response;
     }
 
     /**
@@ -72,7 +98,15 @@ class ApiUserController extends ApiController
      * @throws ResourceValidationException
      */
     public function modifierUtilisateur(Request $request, ValidatorInterface $validator, UserManagerInterface $userManager, User $user = null) {
+        // Log de la request
+        $this->log->info(sprintf('REQUEST;%s;%s|', $request->getRequestUri(), $request->getMethod()));
+        
         if (!$user) {
+            // Log de l'error
+            $responsejson = new JsonResponse(["error" => "Utilisateur non existant !"], 404);
+            $response = json_decode($responsejson->getContent(), true);
+            $this->log->error(sprintf('RESPONSE;%s;%s|', $request->getRequestUri(), $request->getMethod()),$response);
+            
             throw new ResourceValidationException('Utilisateur non existant !');
         }
 
@@ -116,17 +150,32 @@ class ApiUserController extends ApiController
 
         $listErrors = $validator->validate($user);
         if(count($listErrors) > 0) {
-            return new JsonResponse(["error" => (string)$listErrors], 500);
+            $responsejson = new JsonResponse(["error" => (string)$listErrors], 500);
+            $response = json_decode($responsejson->getContent(), true);
+
+            // Log de la response
+            $this->log->error(sprintf('RESPONSE;%s;%s|', $request->getRequestUri(), $request->getMethod()),$response);
+            return $responsejson;
         }
 
         try {
             $em->flush();
             $userManager->updateUser($user, true);
         } catch (\Exception $e) {
-            return new JsonResponse(["error" => "ERROR : ".$e->getMessage()], 500);
+            $responsejson = new JsonResponse(["error" => "ERROR : ".$e->getMessage()], 500);
+            $response = json_decode($responsejson->getContent(), true);
+
+            // Log de la response
+            $this->log->error(sprintf('RESPONSE;%s;%s|', $request->getRequestUri(), $request->getMethod()),$response);
+            return $responsejson;
         }
 
-        return new JsonResponse(["success" => sprintf("%s a été modifié !", $user->getUsername())], 200);
+        $responsejson = new JsonResponse(["success" => sprintf("%s a été modifié !", $user->getUsername())], 200);
+        $response = json_decode($responsejson->getContent(), true);
+            
+        // Log de la response
+        $this->log->info(sprintf('RESPONSE;%s;%s|', $request->getRequestUri(), $request->getMethod()),$response);
+        return $responsejson;
     }
 
     /**
@@ -137,8 +186,16 @@ class ApiUserController extends ApiController
      * @Security("is_granted('ROLE_ADMIN')", statusCode=403, message="Seul un administrateur est autorisé !")
      * @throws ResourceValidationException
      */
-    public function supprimerUtilisateur(User $user = null) {
+    public function supprimerUtilisateur(Request $request, User $user = null) {
+        // Log de la request
+        $this->log->info(sprintf('REQUEST;%s;%s|', $request->getRequestUri(), $request->getMethod()));
+        
         if (!$user) {
+            // Log de l'error
+            $responsejson = new JsonResponse(["error" => "Utilisateur non existant !"], 404);
+            $response = json_decode($responsejson->getContent(), true);
+            $this->log->error(sprintf('RESPONSE;%s;%s|', $request->getRequestUri(), $request->getMethod()),$response);
+            
             throw new ResourceValidationException('Utilisateur non existant !');
         }
 
@@ -146,7 +203,12 @@ class ApiUserController extends ApiController
         $em->remove($user);
         $em->flush();
 
-        return new JsonResponse(["success" => "L'utilisateur a été supprimé !"], 200);
+        $responsejson = new JsonResponse(["success" => "L'utilisateur a été supprimé !"], 200);
+        $response = json_decode($responsejson->getContent(), true);
+            
+        // Log de la response
+        $this->log->info(sprintf('RESPONSE;%s;%s|', $request->getRequestUri(), $request->getMethod()),$response);
+        return $responsejson;
     }
 
     /**
@@ -158,7 +220,15 @@ class ApiUserController extends ApiController
      * @throws ResourceValidationException
      */
     public function envoyerMessage(Request $request, ValidatorInterface $validator, User $destinataire = null) {
+        // Log de la request
+        $this->log->info(sprintf('REQUEST;%s;%s|', $request->getRequestUri(), $request->getMethod()));
+        
         if (!$destinataire) {
+            // Log de l'error
+            $responsejson = new JsonResponse(["error" => "Destinataire non existant !"], 404);
+            $response = json_decode($responsejson->getContent(), true);
+            $this->log->error(sprintf('RESPONSE;%s;%s|', $request->getRequestUri(), $request->getMethod()),$response);
+            
             throw new ResourceValidationException('Destinataire non existant !');
         }
 
@@ -194,14 +264,24 @@ class ApiUserController extends ApiController
 
         $listErrors = $validator->validate($actualConv);
         if(count($listErrors) > 0) {
-            return new JsonResponse(["error" => (string)$listErrors], 500);
+            $responsejson = new JsonResponse(["error" => (string)$listErrors], 500);
+            $response = json_decode($responsejson->getContent(), true);
+
+            // Log de la response
+            $this->log->error(sprintf('RESPONSE;%s;%s|', $request->getRequestUri(), $request->getMethod()),$response);
+            return $responsejson;
         }
 
         $em->persist($message);
         $em->persist($actualConv);
         $em->flush();
 
-        return new JsonResponse(["success" => sprintf("Le message a bien été envoyé à %s !", $destinataire->getUsername())], 201);
+        $responsejson = new JsonResponse(["success" => sprintf("Le message a bien été envoyé à %s !", $destinataire->getUsername())], 201);
+        $response = json_decode($responsejson->getContent(), true);
+            
+        // Log de la response
+        $this->log->info(sprintf('RESPONSE;%s;%s|', $request->getRequestUri(), $request->getMethod()),$response);
+        return $responsejson;
     }
 
     /**
@@ -216,14 +296,28 @@ class ApiUserController extends ApiController
      * @Security("conversation.estMembre(user) or is_granted('ROLE_ADMIN')", statusCode=403, message="Seuls les membres de la conversation peuvent effectuer cette action !"))
      * @throws ResourceValidationException
      */
-    public function afficherConversation(Conversation $conversation = null) {
+    public function afficherConversation(Request $request, Conversation $conversation = null) {
+        // Log de la request
+        $this->log->info(sprintf('REQUEST;%s;%s|', $request->getRequestUri(), $request->getMethod()));
+        
         if (!$conversation) {
+            // Log de l'error
+            $responsejson = new JsonResponse(["error" => "Conversation non existante !"], 404);
+            $response = json_decode($responsejson->getContent(), true);
+            $this->log->error(sprintf('RESPONSE;%s;%s|', $request->getRequestUri(), $request->getMethod()),$response);
+            
+            
             throw new ResourceValidationException('Conversation non existante !');
         }
 
-        $data =  $this->get('serializer')->serialize($conversation, 'json', $this->serializer->serialize('conversation'));
+        $data = $this->serializer->serialize($conversation, 'json');
 
-        return new Response($data);
+        $response = new Response($data);
+
+        // Log de la response
+        $this->log->info(sprintf('RESPONSE;%s;%s|', $request->getRequestUri(), $request->getMethod()),$data);
+        
+        return $response;
     }
 
     /**
@@ -236,8 +330,16 @@ class ApiUserController extends ApiController
      * @Security("user.getId() == id or is_granted('ROLE_ADMIN')", statusCode=403, message="Seul l'utilisateur concerné peut effectuer cette action !"))
      * @throws ResourceValidationException
      */
-    public function listeConversationsParUtilisateur($page, User $user = null) {
+    public function listeConversationsParUtilisateur(Request $request, $page, User $user = null) {
+        // Log de la request
+        $this->log->info(sprintf('REQUEST;%s;%s|', $request->getRequestUri(), $request->getMethod()));
+        
         if (!$user) {
+            // Log de l'error
+            $responsejson = new JsonResponse(["error" => "Utilisateur non existant !"], 404);
+            $response = json_decode($responsejson->getContent(), true);
+            $this->log->error(sprintf('RESPONSE;%s;%s|', $request->getRequestUri(), $request->getMethod()),$response);
+            
             throw new ResourceValidationException('Utilisateur non existant !');
         }
 
@@ -246,14 +348,22 @@ class ApiUserController extends ApiController
             ->findConvByUser($user);
 
         if (!$conversations) {
+            // Log de l'error
+            $responsejson = new JsonResponse(["error" => "Aucune conversation à ce jour !"], 404);
+            $response = json_decode($responsejson->getContent(), true);
+            $this->log->error(sprintf('RESPONSE;%s;%s|', $request->getRequestUri(), $request->getMethod()),$response);
+            
             throw new ResourceValidationException('Aucune conversation à ce jour !');
         }
 
         $paginatedCollection = $this->paginator->paginate($conversations, $page, 4);
-        $serialization = $this->serializer->serialize('conversation', true);
+        $data = $this->serializer->serialize($paginatedCollection, 'json');
 
-        $data =  $this->get('serializer')->serialize($paginatedCollection, 'json', $serialization);
+        $response = new Response($data);
 
-        return new Response($data);
+        // Log de la response
+        $this->log->info(sprintf('RESPONSE;%s;%s|', $request->getRequestUri(), $request->getMethod()),$data);
+        
+        return $response;
     }
 }

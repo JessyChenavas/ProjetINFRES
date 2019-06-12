@@ -93,6 +93,9 @@
     "egulias/email-validator": {
         "version": "2.1.7"
     },
+    "facebook/webdriver": {
+        "version": "1.7.0"
+    },
     "fig/link-util": {
         "version": "1.0.0"
     },
@@ -114,14 +117,50 @@
     "friendsofsymfony/user-bundle": {
         "version": "v2.1.2"
     },
+    "hoa/compiler": {
+        "version": "3.17.08.08"
+    },
+    "hoa/consistency": {
+        "version": "1.17.05.02"
+    },
+    "hoa/event": {
+        "version": "1.17.01.13"
+    },
+    "hoa/exception": {
+        "version": "1.17.01.16"
+    },
+    "hoa/file": {
+        "version": "1.17.07.11"
+    },
+    "hoa/iterator": {
+        "version": "2.17.01.10"
+    },
+    "hoa/math": {
+        "version": "1.17.05.16"
+    },
+    "hoa/protocol": {
+        "version": "1.17.01.14"
+    },
+    "hoa/regex": {
+        "version": "1.17.01.13"
+    },
+    "hoa/stream": {
+        "version": "1.17.02.21"
+    },
+    "hoa/ustring": {
+        "version": "4.17.01.16"
+    },
+    "hoa/visitor": {
+        "version": "2.17.01.16"
+    },
+    "hoa/zformat": {
+        "version": "1.17.01.10"
+    },
     "jdorn/sql-formatter": {
         "version": "v1.2.17"
     },
     "jms/metadata": {
         "version": "2.0.0"
-    },
-    "jms/parser-lib": {
-        "version": "1.0.0"
     },
     "jms/serializer": {
         "version": "2.2.0"
@@ -147,9 +186,6 @@
     "ocramius/proxy-manager": {
         "version": "2.2.2"
     },
-    "phpcollection/phpcollection": {
-        "version": "0.5.0"
-    },
     "phpdocumentor/reflection-common": {
         "version": "1.0.1"
     },
@@ -158,9 +194,6 @@
     },
     "phpdocumentor/type-resolver": {
         "version": "0.4.0"
-    },
-    "phpoption/phpoption": {
-        "version": "1.5.0"
     },
     "psr/cache": {
         "version": "1.0.1"
@@ -302,6 +335,9 @@
             "./src/Kernel.php"
         ]
     },
+    "symfony/http-client": {
+        "version": "v4.3.1"
+    },
     "symfony/http-foundation": {
         "version": "v4.2.4"
     },
@@ -346,6 +382,9 @@
     "symfony/orm-pack": {
         "version": "v1.0.6"
     },
+    "symfony/panther": {
+        "version": "v0.4.1"
+    },
     "symfony/phpunit-bridge": {
         "version": "4.1",
         "recipe": {
@@ -372,6 +411,9 @@
         "version": "v1.10.0"
     },
     "symfony/polyfill-php72": {
+        "version": "v1.11.0"
+    },
+    "symfony/polyfill-php73": {
         "version": "v1.11.0"
     },
     "symfony/process": {
@@ -536,6 +578,12 @@
     },
     "webmozart/assert": {
         "version": "1.4.0"
+    },
+    "willdurand/hateoas": {
+        "version": "3.1.0"
+    },
+    "willdurand/hateoas-bundle": {
+        "version": "2.0-dev"
     },
     "willdurand/jsonp-callback-validator": {
         "version": "v1.1.0"
