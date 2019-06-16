@@ -13,7 +13,7 @@ class ApiController extends AbstractController
     protected $paginator;
     protected $log; //Log de l'API
 
-    public function __construct(SerializerInterface $serializer)
+    public function __construct(SerializerInterface $serializer = null)
     {
         $this->serializer = $serializer;
         $this->paginator = new PaginatingController();
