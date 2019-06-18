@@ -96,42 +96,6 @@ class ApiTrajetController extends ApiController
     }
 
     /**
-     * @Rest\Get("/trajets/depart/{depart}/arrive/{arrive}", defaults={"page" = 1}, name="afficher_trajets_lieu_depart_arrive")
-     * @Rest\Get("/trajets/depart/{depart}/arrive/{arrive}/page{page}", name="afficher_trajets_lieu_depart_arrive_pagine")
-     *
-     * @return Response
-     * @throws ResourceValidationException
-     */
-    public function afficherTrajetParLieuDepartArrive(Request $request, string $depart, string $arrive, $page) {
-        // Log de la request
-        $this->log->info(sprintf('REQUEST;%s;%s|', $request->getRequestUri(), $request->getMethod()));
-        
-        $trajets = $this->getDoctrine()
-            ->getRepository(Trajet::class)
-            ->findBy(['lieuDepart' => $depart, 'lieuArrive' => $arrive]);
-
-        if (!$trajets) {
-            // Log de l'error
-            $responsejson = new JsonResponse(["error" => "Aucun trajet trouvé !"], 404);
-            $response = json_decode($responsejson->getContent(), true);
-            $this->log->error(sprintf('RESPONSE;%s;%s|', $request->getRequestUri(), $request->getMethod()),$response);
-            
-            throw new ResourceValidationException('Aucun trajet trouvé !');
-        }
-
-        $paginatedCollection = $this->paginator->paginate($trajets, $page, 10);
-        $data = $this->serializer->serialize($paginatedCollection, 'json');
-
-        $response = new Response($data);
-
-        // Log de la response
-        $responsejson = json_decode($response->getContent(), true);
-        $this->log->info(sprintf('RESPONSE;%s;%s|', $request->getRequestUri(), $request->getMethod()),$responsejson);
-        
-        return $response;
-    }
-
-    /**
      * @Rest\Get("/trajets", defaults={"page" = 1}, name="liste_trajets")
      * @Rest\Get("/trajets/page{page}", name="liste_trajets_pagine")
      * @throws ResourceValidationException
@@ -141,9 +105,25 @@ class ApiTrajetController extends ApiController
         // Log de la request
         $this->log->info(sprintf('REQUEST;%s;%s|', $request->getRequestUri(), $request->getMethod()));
         
-        $trajets = $this->getDoctrine()
-            ->getRepository(Trajet::class)
-            ->findAll();
+        $filters = [];
+
+        if ($depart = $request->query->get('depart')) {
+            $filters['lieuDepart'] = $depart;
+        }
+
+        if ($arrive = $request->query->get('arrive')) {
+            $filters['lieuArrive'] = $arrive;
+        }
+
+        if (!$filters) {
+            $trajets = $this->getDoctrine()
+                ->getRepository(Trajet::class)
+                ->findAll();
+        } else {
+            $trajets = $this->getDoctrine()
+                ->getRepository(Trajet::class)
+                ->findBy($filters);
+        }
 
             if (!$trajets) {
                 // Log de l'error
