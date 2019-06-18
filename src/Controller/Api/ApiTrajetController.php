@@ -115,15 +115,9 @@ class ApiTrajetController extends ApiController
             $filters['lieuArrive'] = $arrive;
         }
 
-        if (!$filters) {
-            $trajets = $this->getDoctrine()
-                ->getRepository(Trajet::class)
-                ->findAll();
-        } else {
-            $trajets = $this->getDoctrine()
-                ->getRepository(Trajet::class)
-                ->findBy($filters);
-        }
+        $trajets = $this->getDoctrine()
+            ->getRepository(Trajet::class)
+            ->findBy($filters);
 
             if (!$trajets) {
                 // Log de l'error
