@@ -1,0 +1,18 @@
+monolog:
+    handlers:
+        main:
+            type: stream
+            path: "%kernel.logs_dir%/%kernel.environment%.symfony.log"
+            channels: [event, console, doctrine, security]
+        doctrine:
+            type: stream
+            path: "%kernel.logs_dir%/%kernel.environment%.doctrine.log"
+            channels: doctrine
+        login:
+            type: stream
+            path: "%kernel.logs_dir%/%kernel.environment%.auth.log"
+            channels: security
+        event:
+            type: stream
+            path: "%kernel.logs_dir%/%kernel.environment%.event.log"
+            channels: event
